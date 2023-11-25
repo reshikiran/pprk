@@ -69,15 +69,9 @@
 
   <label for="planType">Type of Plan (PhonePe):</label>
   <select id="planType">
-    <option value="1">Plan 1</option>
-    <option value="2">Plan 2</option>
+    <option value="1">Monthly</option>
+    <option value="2">Lifetime</option>
   </select>
-
-  <label for="monthlyTPVCredit">Monthly TPV on Credit Card:</label>
-  <input type="number" id="monthlyTPVCredit" placeholder="Enter TPV on Credit Card">
-
-  <label for="monthlyTPVDebit">Monthly TPV on Debit Card:</label>
-  <input type="number" id="monthlyTPVDebit" placeholder="Enter TPV on Debit Card">
 
   <label for="setupFeeCompetition">Setup Fee (Competition):</label>
   <input type="number" id="setupFeeCompetition" placeholder="Enter Setup Fee (Competition)">
@@ -90,6 +84,12 @@
 
   <label for="rateOnDebitCardCompetition">Rate on Debit Card (Competition, in %):</label>
   <input type="number" id="rateOnDebitCardCompetition" placeholder="Enter Rate on Debit Card (Competition, in %)">
+
+  <label for="monthlyTPVCredit">Monthly TPV on Credit Card:</label>
+  <input type="number" id="monthlyTPVCredit" placeholder="Enter TPV on Credit Card">
+
+  <label for="monthlyTPVDebit">Monthly TPV on Debit Card:</label>
+  <input type="number" id="monthlyTPVDebit" placeholder="Enter TPV on Debit Card">
 
   <button onclick="calculate()">Calculate</button>
 
@@ -156,3 +156,4 @@
 
 </body>
 </html>
+
