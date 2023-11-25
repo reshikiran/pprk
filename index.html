@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhonePe vs Competition Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input {
+      margin-bottom: 10px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <label for="planType">Type of Plan (PhonePe):</label>
+  <select id="planType">
+    <option value="1">Plan 1</option>
+    <option value="2">Plan 2</option>
+  </select>
+
+  <label for="monthlyTPVCredit">Monthly TPV on Credit Card:</label>
+  <input type="number" id="monthlyTPVCredit" placeholder="Enter TPV on Credit Card">
+
+  <label for="monthlyTPVDebit">Monthly TPV on Debit Card:</label>
+  <input type="number" id="monthlyTPVDebit" placeholder="Enter TPV on Debit Card">
+
+  <label for="setupFeeCompetition">Setup Fee (Competition):</label>
+  <input type="number" id="setupFeeCompetition" placeholder="Enter Setup Fee (Competition)">
+
+  <label for="monthlyRentalCompetition">Monthly Rental (Competition):</label>
+  <input type="number" id="monthlyRentalCompetition" placeholder="Enter Monthly Rental (Competition)">
+
+  <label for="rateOnCreditCardCompetition">Rate on Credit Card (Competition, in %):</label>
+  <input type="number" id="rateOnCreditCardCompetition" placeholder="Enter Rate on Credit Card (Competition, in %)">
+
+  <label for="rateOnDebitCardCompetition">Rate on Debit Card (Competition, in %):</label>
+  <input type="number" id="rateOnDebitCardCompetition" placeholder="Enter Rate on Debit Card (Competition, in %)">
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div id="result"></div>
+
+  <script>
+    function calculate() {
+      // Get input values
+      const planType = parseInt(document.getElementById('planType').value);
+      const monthlyTPVCredit = parseFloat(document.getElementById('monthlyTPVCredit').value);
+      const monthlyTPVDebit = parseFloat(document.getElementById('monthlyTPVDebit').value);
+      const setupFeeCompetition = parseFloat(document.getElementById('setupFeeCompetition').value);
+      const monthlyRentalCompetition = parseFloat(document.getElementById('monthlyRentalCompetition').value);
+      const rateOnCreditCardCompetition = parseFloat(document.getElementById('rateOnCreditCardCompetition').value);
+      const rateOnDebitCardCompetition = parseFloat(document.getElementById('rateOnDebitCardCompetition').value);
+
+      // Conditions
+      let r = monthlyTPVCredit + monthlyTPVDebit;
+
+      // Monthly Rental
+      let monthlyRental = 0;
+      if (planType === 1) {
+        if (r < 50000) {
+          monthlyRental = 399;
+        } else if (r >= 50000 && r < 100000) {
+          monthlyRental = 299;
+        } else if (r >= 100000 && r < 200000) {
+          monthlyRental = 199;
+        } else {
+          monthlyRental = 1;
+        }
+      } else if (planType === 2) {
+        monthlyRental = (r >= 100000) ? 0 : 49;
+      }
+
+      // Setup fee
+      let setupFee = (r >= 20000) ? 99 : 999;
+
+      // Total cost for PhonePe
+      let totalCostPhonePe = 0;
+      if (planType === 1) {
+        totalCostPhonePe = setupFee + ((0.012 * monthlyTPVCredit + 0.004 * monthlyTPVDebit) * 12) + (monthlyRental * 6) + (399 * 6);
+      } else if (planType === 2) {
+        totalCostPhonePe = (r >= 200000) ? (4099 / 1.5) + ((0.012 * monthlyTPVCredit + 0.004 * monthlyTPVDebit) * 12) + (monthlyRental * 6) + (49 * 6) : (6499 / 1.5) + ((0.012 * monthlyTPVCredit + 0.004 * monthlyTPVDebit) * 12) + (monthlyRental * 6) + (49 * 6);
+      }
+
+      // Total cost for Competition
+      let totalCostCompetition = setupFeeCompetition + ((rateOnCreditCardCompetition / 100 * monthlyTPVCredit + rateOnDebitCardCompetition / 100 * monthlyTPVDebit + monthlyRentalCompetition) * 12);
+
+      // Monthly Savings
+      let monthlySavings = (totalCostCompetition - totalCostPhonePe) / 12;
+
+      // Display result
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `
+        <h3>Results:</h3>
+        <p>Monthly Rental (PhonePe): $${monthlyRental.toFixed(2)}</p>
+        <p>Total Cost for 1 Year (PhonePe): $${totalCostPhonePe.toFixed(2)}</p>
+        <p>Total Cost for 1 Year (Competition): $${totalCostCompetition.toFixed(2)}</p>
+        <p>Monthly Savings: $${monthlySavings.toFixed(2)}</p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
