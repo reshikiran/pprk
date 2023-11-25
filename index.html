@@ -6,8 +6,15 @@
   <title>PhonePe vs Competition Calculator</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
       margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4caf50;
     }
 
     label {
@@ -16,11 +23,21 @@
     }
 
     input {
-      margin-bottom: 10px;
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
     }
 
     button {
-      margin-top: 10px;
+      width: 100%;
       padding: 10px;
       background-color: #4caf50;
       color: white;
@@ -31,10 +48,20 @@
 
     #result {
       margin-top: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    p {
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
+
+  <h1>PhonePe vs Competition Calculator</h1>
 
   <label for="planType">Type of Plan (PhonePe):</label>
   <select id="planType">
