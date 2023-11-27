@@ -70,7 +70,7 @@
     </select>
 
     <label for="date">Date:</label>
-    <input type="number" id="date" placeholder="Enter date" value="1" max="31" required>
+    <input type="number" id="date" placeholder="Enter date" value="1" min="1" max="31" required>
 
     <label for="acquisitions">Number of Valid Acquisitions/Onboardings till date (Runs=2):</label>
     <input type="number" id="acquisitions" placeholder="Enter value for Runs=2" value="0" required>
@@ -135,6 +135,7 @@
  	    x[13] = parseInt(document.getElementById('extra').value);
             // Repeat the above line for the remaining 8 inputs
 let r
+let b=31/x[3]
 let a=x[7]+x[8]
 //RRR
 /*if(x[2]==1)
@@ -181,12 +182,12 @@ else
 if(x[2]==1)
 {
 	if(x[5]/x[3]<50/30){y[2]=0}
-	else{y[2]=x[4]*2+x[5]*4+x[6]*20+x[7]*2+x[8]*3+x[9]+x[13]+r}
+	else{y[2]=b*(x[4]*2+x[5]*4+x[6]*20+x[7]*2+x[8]*3+x[9]+x[13]+r)}
 }
 else if(x[2]==2)
 {
 	if(x[5]/x[3]<30/30){y[2]=0}
-	else{y[2]=x[4]*2+x[5]*4+x[6]*20+x[7]*2+x[8]*3+x[9]+x[13]+r}
+	else{y[2]=b*(x[4]*2+x[5]*4+x[6]*20+x[7]*2+x[8]*3+x[9]+x[13]+r)}
 }
 //Incentive
 if(x[1]==1)
