@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Incentive Calculator</title>
+    <title>Incentive Calculator (Urban)</title>
     <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,12 +11,6 @@
       color: #333;
       margin: 20px;
     }
-
-    h1 {
-      text-align: center;
-      color: #4caf50;
-    }
-
     label {
       display: block;
       margin-bottom: 5px;
@@ -28,21 +22,21 @@
       margin-bottom: 15px;
       box-sizing: border-box;
     }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-        button:hover {
-            background-color: #45a049;
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
-
+    h1 {
+      text-align: center;
+      color: #4caf50;
+    }
+        h3 {
+            margin-top: 20px;
+        }
         p {
             margin: 10px 0;
         }
@@ -55,130 +49,214 @@
             border-radius: 5px;
             display: inline-block;
         }
-
-        /* Style for the Results section */
-        h2 {
-            color: #6739B7;
-        }
-
-        #results {
-            background-color: #6739B7;
-            color: white;
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
     </style>
-    <script>
-        function calculateIncentive() {
-            const date = parseFloat(document.getElementById("date").value) || 1;
-            const agentType = parseInt(document.getElementById("agentType").value);
-            const acqPoints = parseInt(document.getElementById("acqPoints").value) || 0;
-            const ssdPoints = parseInt(document.getElementById("ssdPoints").value) || 0;
-            const closuresPoints = parseInt(document.getElementById("closuresPoints").value) || 0;
-            const m1Points = parseInt(document.getElementById("m1Points").value) || 0;
-            const recoveryPoints = parseInt(document.getElementById("recoveryPoints").value) || 0;
-
-            const r = 30 / date;
-
-            let acqRequired = 0;
-            if (agentType === 1) {
-                acqRequired = acqPoints >= 30 ? 0 : 30 - acqPoints;
-            }
-
-            let ssdRequired = 0;
-            if (agentType === 1) {
-                ssdRequired = ssdPoints >= 40 ? 0 : 40 - closuresPoints;
-            }
-
-            let totalPoints = 0;
-            if (agentType === 1) {
-                if (r * acqPoints < 30 && r * ssdPoints < 40) {
-                    totalPoints = 0;
-                } else if (r * acqPoints >= 30 && r * ssdPoints >= 40) {
-                    totalPoints = r * (acqPoints * 5 + ssdPoints * 10 + closuresPoints * 28 + m1Points * 4 + recoveryPoints * 5);
-                }
-            } else if (agentType === 2) {
-                totalPoints = r * (acqPoints * 5 + ssdPoints * 10 + closuresPoints * 28 + m1Points * 4 + recoveryPoints * 5);
-            }
-
-            let totalIncentive = 0;
-            if (agentType === 1) {
-                if (totalPoints < 625) {
-                    totalIncentive = 0;
-                } else if (totalPoints < 725) {
-                    totalIncentive = 6 * totalPoints;
-                } else if (totalPoints < 925) {
-                    totalIncentive = 8 * totalPoints;
-                } else if (totalPoints < 1125) {
-                    totalIncentive = 10 * totalPoints;
-                } else if (totalPoints >= 1125) {
-                    totalIncentive = 14 * totalPoints;
-                }
-            } else if (agentType === 2) {
-                if (totalPoints < 225) {
-                    totalIncentive = 0;
-                } else if (totalPoints < 425) {
-                    totalIncentive = 6 * totalPoints;
-                } else if (totalPoints < 625) {
-                    totalIncentive = 8 * totalPoints;
-                } else if (totalPoints < 725) {
-                    totalIncentive = 10 * totalPoints;
-                } else if (totalPoints >= 725) {
-                    totalIncentive = 14 * totalPoints;
-                }
-            }
-
-            if (r * closuresPoints >= 8) {
-                totalIncentive *= 1.3;
-            }
-
-            totalIncentive = Math.min(totalIncentive, 20000);
-
-            document.getElementById("acqRequired").innerHTML = acqRequired;
-            document.getElementById("ssdRequired").innerHTML = ssdRequired;
-            document.getElementById("totalPoints").innerHTML = totalPoints.toFixed(2);
-            document.getElementById("totalIncentive").innerHTML = totalIncentive.toFixed(2);
-        }
-    </script>
 </head>
 <body>
 
     <h1>Incentive Calculator (Urban)</h1>
 
-    <label for="date">Date (Eg: If current date is 10th November 2023, enter 10):</label>
-    <input type="number" id="date" min="1" max="31" value="1" required><br>
+    <!-- Input Fields -->
+    <label for="workLocation">Work Location:</label>
+    <select id="workLocation">
+        <option value="1">Rest of India</option>
+        <option value="2">Bangalore, Hyderabad, Jaipur, Pune</option>
+        <option value="3">Kerala, West Bengal, Punjab, NE, Jammu and Kashmir</option>
+    </select>
 
-    <label for="agentType">Agent Type:</label>
-    <select id="agentType" required>
-        <option value="1">Old Agent</option>
-        <option value="2">New Agent</option>
-    </select><br>
+    <label for="bdaBdeType">Type of BDA/BDE:</label>
+    <select id="bdaBdeType">
+        <option value="1">Old BDA/BDE</option>
+        <option value="2">New BDA/BDE</option>
+    </select>
 
-    <label for="acqPoints">Number of Valid Acquisitions till date (5 Points):</label>
-    <input type="number" id="acqPoints" value="0" required><br>
+    <label for="date">Date:</label>
+    <input type="number" id="date" placeholder="Enter date" value="0" required>
 
-    <label for="ssdPoints">Number of Valid SSD/PB Leads till date (10 Points):</label>
-    <input type="number" id="ssdPoints" value="0" required><br>
+    <label for="acquisitions">Number of Valid Acquisitions/Onboardings till date (Runs=2):</label>
+    <input type="number" id="acquisitions" placeholder="Enter value for Runs=2" value="0" required>
 
-    <label for="closuresPoints">Number of Valid Lending Agreement Closures(M0) till date (28 Points):</label>
-    <input type="number" id="closuresPoints" value="0" required><br>
+    <!-- Add labels and input fields for x[5] to x[13] -->
+    <!-- Repeat the following block for the remaining 9 inputs -->
+    <label for="ssDeployments">Number of Valid SS Deployments till date (Runs=4):</label>
+    <input type="number" id="ssDeployments" placeholder="Enter value for Runs=4" value="0" required>
 
-    <label for="m1Points">M1 on Agreement Closure (4 Points):</label>
-    <input type="number" id="m1Points" value="0" required><br>
+ <label for="lending">Number of Lending till date (Runs=20):</label>
+    <input type="number" id="lending" placeholder="Enter value for Runs=4" value="0" required>
 
-    <label for="recoveryPoints">Reactivation/Rental Recovery/Reverse Pick up till date (5 Points):</label>
-    <input type="number" id="recoveryPoints" value="0" required><br>
+    <!-- Repeat the above block for the remaining 8 inputs -->
+<label for="revisit">Number of  Valid Revisit, RVP, MHD, MAM droppers till date (Runs=2):</label>
+    <input type="number" id="revisit" placeholder="Enter value for Runs=2" value="0" required>
 
-    <button onclick="calculateIncentive()">Calculate</button>
+<label for="recovery">Number of Valid  Recovery till date (Runs=3):</label>
+    <input type="number" id="recovery" placeholder="Enter value for Runs=3" value="0" required>
 
-    <h2>Results</h2>
-    <div id="results">
-        <p>Number of acquisitions required to achieve incentive gate (Old Agent): <span id="acqRequired"></span></p>
-        <p>Number of SSD deployments required to achieve incentive gate (Old Agent): <span id="ssdRequired"></span></p>
-        <p>Expected total points this month: <span id="totalPoints"></span></p>
-        <p>Expected total incentive for this month (Rs.): <span id="totalIncentive"></span></p>
-    </div>
+<label for="winback">Number of check-in winback (Run=1):</label>
+    <input type="number" id="winback" placeholder="Enter value for Runs=1" value="0" required>
+
+<label for="gross17">Number of days for which Gross Runs more than 17 (For Old agents only):</label>
+    <input type="number" id="gross17" placeholder="Enter value" value="0" required>
+
+<label for="gross20">Number of days for which Gross Runs more than 20 (For Old agents of Ker, WB, Pun, NE, J and K only):</label>
+    <input type="number" id="gross20" placeholder="Enter value" value="0" required>
+
+<label for="gross12">Number of days for which Gross Runs more 12 (For new agents only):</label>
+    <input type="number" id="gross12" placeholder="Enter value" value="0" required>
+
+<label for="extra">Total Extra (additional) runs earned till date:</label>
+    <input type="number" id="extra" placeholder="Enter value" value="0" required>
+
+    <button onclick="calculateIncentive()">Calculate Incentive</button>
+
+    <!-- Results -->
+    <h3>Results:</h3>
+    <p>Number of SS deployments required to achieve incentive gate: <span id="ssDeploymentsResult"></span></p>
+    <p>Expected net runs for this month: <span id="netRunsResult"></span></p>
+    <p>Expected total incentive for this month (Rs.): <span id="totalIncentiveResult"></span></p>
+
+    <script>
+        function calculateIncentive() {
+            var x = [];
+            var y = [0, 0, 0]; // Initialize y with zeros for the three outputs
+
+            x[1] = parseInt(document.getElementById('workLocation').value);
+            x[2] = parseInt(document.getElementById('bdaBdeType').value);
+            x[3] = parseInt(document.getElementById('date').value);
+            x[4] = parseInt(document.getElementById('acquisitions').value);
+
+            // Repeat the following block for the remaining 9 inputs
+            x[5] = parseInt(document.getElementById('ssDeployments').value);
+            x[6] = parseInt(document.getElementById('lending').value);
+	    x[7] = parseInt(document.getElementById('revisit').value);
+ 	    x[8] = parseInt(document.getElementById('recovery').value);
+ 	    x[9] = parseInt(document.getElementById('winback').value);
+ 	    x[10] = parseInt(document.getElementById('gross17').value);
+ 	    x[11] = parseInt(document.getElementById('gross20').value);
+ 	    x[12] = parseInt(document.getElementById('gross12').value);
+ 	    x[13] = parseInt(document.getElementById('extra').value);
+            // Repeat the above line for the remaining 8 inputs
+let r
+let a=x[7]+x[8]
+//RRR
+/*if(x[2]==1)
+{
+	if(x[7]+x[8]>=60){y[1]=0}
+	else{y[1]=60-(x[7]+x[8])}
+}
+else if(x[2]==2)
+{
+	if(x[7]+x[8]>=40){y[1]=0}
+	else{y[1]=40-(x[7]+x[8])}
+}*/
+//SS
+if(x[2]==1)
+{
+	if(x[5]>=60){y[1]=0}
+	else{(y[1]=50-x[5])}
+}
+else if(x[2]==2)
+{
+	if(x[5]>=40){y[1]=0}
+	else{y[1]=30-x[5]}
+}
+//Extra 50/100
+if(x[2]==1 && x[1]==3)
+{
+	if(x[11]*31/x[3]>=15&& x[11]*31/x[3]<20){r=50}
+	else if(x[11]*31/x[3]>=20){r=100}
+	else{r=0}
+}
+else if(x[2]==2)
+{
+	if(x[12]*31/x[3]>=15 && x[12]*31/x[3]<20){r=50}
+	else if(x[12]*31/x[3]>=20){r=100}
+	else{r=0}
+}
+else 
+{
+	if(x[10]*31/x[3]>=15 && x[10]*31/x[3]<20){r=50}
+	else if(x[10]*31/x[3]>=20){r=100}
+	else{r=0}
+}
+//gate
+if(x[2]==1)
+{
+	if(x[5]/x[3]<50/30){y[2]=0}
+	else{y[2]=x[4]*2+x[5]*4+x[6]*20+x[7]*2+x[8]*3+x[9]+x[13]+r}
+}
+else if(x[2]==2)
+{
+	if(x[5]/x[3]<30/30){y[2]=0}
+	else{y[2]=x[4]*2+x[5]*4+x[6]*20+x[7]*2+x[8]*3+x[9]+x[13]+r}
+}
+//Incentive
+if(x[1]==1)
+{
+	if(x[2]==1)
+	{
+		if(y[2]<275){y[3]=0}
+		else if(y[2]<325){y[3]=12*y[2]}
+		else if(y[2]<425){y[3]=15*y[2]}
+		else if(y[2]<550){y[3]=20*y[2]}
+		else if(y[2]>=550){y[3]=25*y[2]}
+	}
+	else if(x[2]==2)
+	{
+		if(y[2]<125){y[3]=0}
+		else if(y[2]<200){y[3]=12*y[2]}
+		else if(y[2]<300){y[3]=15*y[2]}
+		else if(y[2]<400){y[3]=20*y[2]}
+		else if(y[2]>=400){y[3]=25*y[2]}
+	}
+}
+else if(x[1]==2)
+{
+	if(x[2]==1)
+	{
+		if(y[2]<275){y[3]=0}
+		else if(y[2]<325){y[3]=15*y[2]}
+		else if(y[2]<425){y[3]=18*y[2]}
+		else if(y[2]<550){y[3]=22*y[2]}
+		else if(y[2]>=550){y[3]=28*y[2]}
+	}
+	else if(x[2]==2)
+	{
+		if(y[2]<125){y[3]=0}
+		else if(y[2]<200){y[3]=15*y[2]}
+		else if(y[2]<300){y[3]=18*y[2]}
+		else if(y[2]<400){y[3]=22*y[2]}
+		else if(y[2]>=400){y[3]=28*y[2]}
+	}
+}
+else if(x[1]==3)
+{
+	if(x[2]==1)
+	{
+		if(y[2]<275){y[3]=0}
+		else if(y[2]<325){y[3]=10*y[2]}
+		else if(y[2]<425){y[3]=12*y[2]}
+		else if(y[2]<550){y[3]=16*y[2]}
+		else if(y[2]>=550){y[3]=22*y[2]}
+	}
+	else if(x[2]==2)
+	{
+		if(y[2]<125){y[3]=0}
+		else if(y[2]<200){y[3]=10*y[2]}
+		else if(y[2]<300){y[3]=12*y[2]}
+		else if(y[2]<400){y[3]=16*y[2]}
+		else if(y[2]>=400){y[3]=22*y[2]}
+	}
+}
+if(x[6]/x[3]>=8/31){y[3]=1.25*y[3]}
+else{y[3]=y[3]}
+y[3]=Math.min(y[3],20000)
+
+
+            // Update the result elements
+            document.getElementById('ssDeploymentsResult').textContent = y[1];
+            document.getElementById('netRunsResult').textContent = y[2];
+            document.getElementById('totalIncentiveResult').textContent = y[3];
+        }
+    </script>
 
 </body>
 </html>
