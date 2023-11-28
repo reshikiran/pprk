@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-88EHVLE2RS"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-88EHVLE2RS');
-</script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-88EHVLE2RS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-88EHVLE2RS');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Incentive/Savings Calculator</title>
@@ -30,11 +29,23 @@
         }
         .image-container {
             text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        img {
+        .image-container img {
             max-width: 100%;
             height: auto;
             margin: 10px; /* Optional: Set margin for spacing */
+        }
+        .caption {
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            /* Adjust the width for small screens (e.g., mobile devices) */
+            .image-container img {
+                width: 48%; /* Two images side by side */
+            }
         }
     </style>
 </head>
@@ -42,24 +53,15 @@
     <header>
         <h1>Incentive/Savings Calculator</h1>
         <div class="image-container">
-	          <a href="Incentive Calculator Urban Ace Collection.html">
-               <img src="Pic 1.png" alt="Description of the second image">
+            <a href="Incentive Calculator Urban Ace Collection.html">
+                <img src="Pic 1.png" alt="Description of the second image">
             </a>
-		<p class="caption">
-                <a href="Incentive Calculator Urban Ace Collection.html">Incentive Calculator (Urban)</a>
-            	</p>
             <a href="EDC Savings Small Ace Collection.html">
                 <img src="Pic 2.png" alt="Description of the first image">
             </a>
-	        <p class="caption">
-                <a href="EDC Savings Small Ace Collection.html">EDC Savings Calculator (Small Merchants)</a>
-            	</p>
-	 <a href="EDC Savings Large Ace Collection.html">
+            <a href="EDC Savings Large Ace Collection.html">
                 <img src="Pic 3.png" alt="Description of the first image">
             </a>
-	        <p class="caption">
-                <a href="EDC Savings Large Ace Collection.html">EDC Savings Calculator (Large Merchants)</a>
-            	</p>
         </div>
     </header>
     <!-- Your calculator content goes here -->
