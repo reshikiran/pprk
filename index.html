@@ -27,46 +27,62 @@
             margin: 0;
             color: #333; /* Optional: Set the text color */
         }
-        .image-container {
+        .button-container {
             text-align: center;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
         }
-        .image-container a {
+        .button-container a {
             width: 48%;
-            margin: 5px; /* Optional: Set margin for spacing */
+            margin: 10px; /* Adjust the margin for spacing between buttons */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ccc; /* Optional: Add a border for styling */
+            border-radius: 8px; /* Optional: Add border radius for styling */
+            padding: 20px; /* Optional: Add padding for spacing */
+            text-decoration: none; /* Optional: Remove underline */
+            color: white; /* Set button text color */
+            font-weight: bold; /* Set font weight to bold */
         }
-        .image-container img {
-            max-width: 100%;
-            height: auto;
+        .button-container a:nth-child(1) {
+            background-color: #9B51E0; /* Set background color for the first button */
+        }
+        .button-container a:nth-child(2) {
+            background-color: #345C00; /* Set background color for the second button */
+        }
+        .button-container a:nth-child(3) {
+            background-color: #2323A4; /* Set background color for the third button */
         }
         .caption {
             text-align: center;
         }
         @media (max-width: 600px) {
             /* Adjust the width for small screens (e.g., mobile devices) */
-            .image-container a {
-                width: 100%; /* Make images take full width on small screens */
+            .button-container a {
+                width: 100%; /* Make buttons take full width on small screens */
             }
         }
     </style>
+    <!-- Include FontAwesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-6eCJbRZ+f3cAekPHyHEJrskIJN2Sf3GjLjyo3u98KSP6Ag4K/N4pZ38cM8PFMBo8Ag6BwlVdhFdQl0BDaCsOVtQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <header>
         <h1>Incentive/Savings Calculator</h1>
-        <div class="image-container">
+    </header>
+        <div class="button-container">
             <a href="Incentive Calculator Urban Ace Collection.html">
-                <img src="Pic 1.png" alt="Description of the first image">
+                Incentive Calculator (Urban)
             </a>
             <a href="EDC Savings Small Ace Collection.html">
-                <img src="Pic 2.png" alt="Description of the second image">
+                EDC Savings Calculator <br> (Small Merchants)
             </a>
-            <a href="EDC Savings Large Ace Collection.html" style="width: 100%;">
-                <img src="Pic 3.png" alt="Description of the third image">
+            <a href="EDC Savings Large Ace Collection.html">
+                EDC Savings Calculator <br> (Large Merchants)
             </a>
         </div>
-    </header>
     <!-- Your calculator content goes here -->
 </body>
 </html>
