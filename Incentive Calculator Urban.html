@@ -126,7 +126,9 @@
 
     <button onclick="calculateIncentive()">Calculate Incentive</button>
 
-    <!-- Results -->
+     // Display result
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML =
     <h3>Results:</h3>
     <p>Number of SS deployments required to achieve incentive gate: <span id="ssDeploymentsResult"></span></p>
     <p>Expected net runs for this month: <span id="netRunsResult"></span></p>
