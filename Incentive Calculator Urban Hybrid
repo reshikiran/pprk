@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incentive Calculator (Hybrid agents)</title>
+    <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      margin: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    h1 {
+      text-align: center;
+      color: #4caf50;
+    }
+        h4 {
+            margin-top: 20px;
+        }
+        h3 {
+            margin-top: 20px;
+        }
+        p {
+            margin: 10px 0;
+        }
+
+        span {
+            font-weight: bold;
+            color: white;
+            background-color: #6739B7;
+            padding: 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Incentive Calculator (Urban)</h1>
+
+    <!-- Input Fields -->
+    <label for="workLocation">Work Location:</label>
+    <select id="workLocation">
+        <option value="1">Rest of India</option>
+        <option value="2">Bangalore, Hyderabad, Jaipur, Pune</option>
+        <option value="3">Kerala, West Bengal, Punjab, NE, Jammu and Kashmir</option>
+    </select>
+
+    <label for="bdaBdeType">Type of BDA/BDE:</label>
+    <select id="bdaBdeType">
+        <option value="1">Old BDA/BDE</option>
+        <option value="2">New BDA/BDE</option>
+    </select>
+
+    <label for="date">Date:</label>
+    <input type="number" id="date" placeholder="Enter date" value="1" min="1" max="32" required>
+
+    <label for="acquisitions">Number of Valid Acquisitions/Onboardings till date (Runs=2):</label>
+    <input type="number" id="acquisitions" placeholder="Enter value for Runs=2" value="0" required>
+
+    <!-- Add labels and input fields for x[5] to x[13] -->
+    <!-- Repeat the following block for the remaining 9 inputs -->
+    <label for="ssDeployments">Number of Valid SS Deployments till date (Runs=4):</label>
+    <input type="number" id="ssDeployments" placeholder="Enter value for Runs=4" value="0" required>
+
+ <label for="lending">Number of Lending till date (Runs=20):</label>
+    <input type="number" id="lending" placeholder="Enter value for Runs=4" value="0" required>
+
+    <!-- Repeat the above block for the remaining 8 inputs -->
+<label for="revisit">Number of  Valid Revisit, RVP, MHD, MAM droppers till date (Runs=2):</label>
+    <input type="number" id="revisit" placeholder="Enter value for Runs=2" value="0" required>
+
+<label for="recovery">Number of Valid  Recovery till date (Runs=3):</label>
+    <input type="number" id="recovery" placeholder="Enter value for Runs=3" value="0" required>
+
+<label for="winback">Number of check-in winback (Run=0.5):</label>
+    <input type="number" id="winback" placeholder="Enter value for Runs=0.5" value="0" required>
+
+<label for="gross17">Number of days for which Gross Runs more than 17 (For Old agents only):</label>
+    <input type="number" id="gross17" placeholder="Enter value" value="0" required>
+
+<label for="gross12">Number of days for which Gross Runs more 12 (For new agents only):</label>
+    <input type="number" id="gross12" placeholder="Enter value" value="0" required>
+
+<label for="extra">Total Extra (additional) runs earned till date:</label>
+    <input type="number" id="extra" placeholder="Enter value" value="0" required>
+
+    <button onclick="calculateIncentive()">Calculate Incentive</button>
+
+    <h3>Results:</h3>
+    <p>Number of SS deployments required to achieve incentive gate: <span id="ssDeploymentsResult"></span></p>
+    <p>Expected net runs for this month: <span id="netRunsResult"></span></p>
+    <p>Expected total incentive for this month (Rs.): <span id="totalIncentiveResult"></span></p>
+
+    <script>
+        function calculateIncentive() {
+            var x = [];
+            var y = [0, 0, 0]; // Initialize y with zeros for the three outputs
+
+            x[1] = parseInt(document.getElementById('workLocation').value);
+            x[2] = parseInt(document.getElementById('bdaBdeType').value);
+            x[3] = parseInt(document.getElementById('date').value);
+            x[4] = parseInt(document.getElementById('acquisitions').value);
+
+            // Repeat the following block for the remaining 9 inputs
+            x[5] = parseInt(document.getElementById('ssDeployments').value);
+            x[6] = parseInt(document.getElementById('lending').value);
+	    x[7] = parseInt(document.getElementById('revisit').value);
+ 	    x[8] = parseInt(document.getElementById('recovery').value);
+ 	    x[9] = parseInt(document.getElementById('winback').value);
+ 	    x[10] = parseInt(document.getElementById('gross17').value);
+ 	   // x[11] = parseInt(document.getElementById('gross20').value);
+ 	    x[12] = parseInt(document.getElementById('gross12').value);
+ 	    x[13] = parseInt(document.getElementById('extra').value);
+            // Repeat the above line for the remaining 8 inputs
+let r
+let b=31/x[3]
+let a=x[7]+x[8]
+//RRR
+/*if(x[2]==1)
+{
+	if(x[7]+x[8]>=60){y[1]=0}
+	else{y[1]=60-(x[7]+x[8])}
+}
+else if(x[2]==2)
+{
+	if(x[7]+x[8]>=40){y[1]=0}
+	else{y[1]=40-(x[7]+x[8])}
+}*/
+//SS
+if(x[2]==1)
+{
+	if(x[5]>=60){y[1]=0}
+	else{(y[1]=50-x[5])}
+}
+else if(x[2]==2)
+{
+	if(x[5]>=40){y[1]=0}
+	else{y[1]=30-x[5]}
+}
+//Extra 50/100
+/*if(x[2]==1 && x[1]==3)
+{
+	if(x[11]*31/x[3]>=15&& x[11]*31/x[3]<20){r=50}
+	else if(x[11]*31/x[3]>=20){r=100}
+	else{r=0}
+}*/
+if(x[2]==2)
+{
+	if(x[12]*31/x[3]>=15 && x[12]*31/x[3]<20){r=50}
+	else if(x[12]*31/x[3]>=20){r=100}
+	else{r=0}
+}
+else if(x[2]==1)
+{
+	if(x[10]*31/x[3]>=15 && x[10]*31/x[3]<20){r=50}
+	else if(x[10]*31/x[3]>=20){r=100}
+	else{r=0}
+}
+//gate
+if(x[2]==1)
+{
+	if(x[5]/x[3]<50/30){y[2]=0}
+	else{y[2]=b*(x[4]*2+x[5]*4+x[6]*20+x[7]*2+x[8]*3+x[9]*0.5+x[13]+r)}
+}
+else if(x[2]==2)
+{
+	if(x[5]/x[3]<30/30){y[2]=0}
+	else{y[2]=b*(x[4]*2+x[5]*4+x[6]*20+x[7]*2+x[8]*3+x[9]*0.5+x[13]+r)}
+}
+//Incentive
+if(x[1]==1)
+{
+	if(x[2]==1)
+	{
+		if(y[2]<300){y[3]=0}
+		else if(y[2]<=399){y[3]=12*y[2]}
+		else if(y[2]<=550){y[3]=18*y[2]}
+		else if(y[2]>550){y[3]=25*y[2]}
+	}
+	else if(x[2]==2)
+	{
+		if(y[2]<150){y[3]=0}
+		else if(y[2]<=299){y[3]=12*y[2]}
+		else if(y[2]<=550){y[3]=18*y[2]}
+		else if(y[2]>550){y[3]=25*y[2]}
+	}
+}
+else if(x[1]==2)
+{
+	if(x[2]==1)
+	{
+		if(y[2]<300){y[3]=0}
+		else if(y[2]<=399){y[3]=15*y[2]}
+		else if(y[2]<=550){y[3]=20*y[2]}
+		else if(y[2]>550){y[3]=28*y[2]}
+	}
+	else if(x[2]==2)
+	{
+		if(y[2]<150){y[3]=0}
+		else if(y[2]<=299){y[3]=15*y[2]}
+		else if(y[2]<=550){y[3]=20*y[2]}
+		else if(y[2]>550){y[3]=28*y[2]}
+	}
+}
+else if(x[1]==3)
+{
+	if(x[2]==1)
+	{
+		if(y[2]<300){y[3]=0}
+		else if(y[2]<=399){y[3]=10*y[2]}
+		else if(y[2]<=550){y[3]=16*y[2]}
+		else if(y[2]>550){y[3]=22*y[2]}
+	}
+	else if(x[2]==2)
+	{
+		if(y[2]<150){y[3]=0}
+		else if(y[2]<=299){y[3]=10*y[2]}
+		else if(y[2]<=550){y[3]=16*y[2]}
+		else if(y[2]>550){y[3]=22*y[2]}
+	}
+}
+if(x[6]/x[3]>=8/31){y[3]=1.25*y[3]}
+else{y[3]=y[3]}
+y[3]=Math.min(y[3],20000)
+
+
+            // Update the result elements
+            document.getElementById('ssDeploymentsResult').textContent = y[1];
+            document.getElementById('netRunsResult').textContent = y[2];
+            document.getElementById('totalIncentiveResult').textContent = y[3];
+        }
+    </script>
+<h4>Disclaimers:</h4>
+    <ul>
+        <li>Expected total incentive will show ‘0’ if the minimum conditions for the incentive gate are not met.</li>
+        <li>Total incentive is calculated after adjusting the lending booster (1.25x), wherever applicable.</li>
+        <li>Runs for each valid smartspeaker deployment are taken as 4.</li>
+        <li>Runs for each revisit, RVP, MHD, and MAM droppers are taken as 2.</li>
+        <li>Runs for each recovery are taken as 3.</li>
+        <li>Final outputs are based on certain assumptions. Exact net runs and incentives may vary.</li>
+    </ul>
+</body>
+</html>
