@@ -37,28 +37,21 @@
         h4 {
             margin-top: 20px;
         }
-    #result {
-      margin-top: 20px;
-      background-color: #6739B7;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      color: white;
-    }
+        h3 {
+            margin-top: 20px;
+        }
+        p {
+            margin: 10px 0;
+        }
 
-    #result h3 {
-      color: white;
-      margin-bottom: 15px;
-    }
-
-    #result p {
-      margin: 10px 0;
-    }
-
-    #result .highlight {
-      font-weight: bold;
-      color: white;
-    }
+        span {
+            font-weight: bold;
+            color: white;
+            background-color: #6739B7;
+            padding: 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -114,9 +107,6 @@
 
     <button onclick="calculateIncentive()">Calculate Incentive</button>
 
-     // Display result
-      const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML =
     <h3>Results:</h3>
     <p>Number of SS deployments required to achieve incentive gate: <span id="ssDeploymentsResult"></span></p>
     <p>Expected net runs for this month: <span id="netRunsResult"></span></p>
