@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RDD ROI Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4caf50;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 20px;
+      background-color: #6739B7;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      color: white;
+    }
+
+    #result h3 {
+      color: white;
+      margin-bottom: 15px;
+    }
+
+    #result p {
+      margin: 10px 0;
+    }
+
+    #result .highlight {
+      font-weight: bold;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>RDD ROI Calculator</h1>
+
+  <label for="x[1]">Deposit Amount:</label>
+  <select id="x[1]">
+    <option value="10000">Rs. 10000</option>
+    <option value="25000">Rs. 25000</option>
+  </select>
+
+  <label for="x[2]">Number of Valid Acquisitions per month (Rs. 100):</label>
+  <input type="number" id="x[2]" placeholder="Enter Number of Valid Acquisitions per month" value="0">
+
+  <label for="x[3]">M1 Valid Acquisitions (Rs. 25):</label>
+  <input type="number" id="x[3]" placeholder="Enter M1 Valid Acquisitions" value="0">
+
+  <label for="x[4]">Lending Agreement Closure (M0) per month (Rs. 700):</label>
+  <input type="number" id="x[4]" placeholder="Enter Number of Lending Agreement Closure (M0) per month" value="0">
+
+  <label for="x[5]">M1 on Agreement Closure (Enter a number) (Rs. 100):</label>
+  <input type="number" id="x[5]" placeholder="Enter M1 on Agreement Closure" value="0">
+
+  <label for="x[6]">Reactivation/Rental Recovery/Reverse Pick up per month (Rs. 125):</label>
+  <input type="number" id="x[6]" placeholder="Enter Number of Reactivation/Rental Recovery/Reverse Pick up per month" value="0">
+
+  <label for="x[7]">Valid SSDs/PB Leads per month (Rs. 250):</label>
+  <input type="number" id="x[7]" placeholder="Enter Number of Valid SSDs/PB Leads per month" value="0">
+
+  <label for="x[8]">M2 Valid Acquisitions (Rs. 25):</label>
+  <input type="number" id="x[8]" placeholder="Enter M2 Valid Acquisitions" value="0">
+
+  <label for="x[9]">M2 on Agreement Closure (Enter a number) (Rs. 100):</label>
+  <input type="number" id="x[9]" placeholder="Enter M2 on Agreement Closure" value="0">
+
+  <label for="x[10]">Checkin and banner click on Lending base (Rs. 25):</label>
+  <input type="number" id="x[10]" placeholder="Enter Number of Checkin and banner click on Lending base" value="0">
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div id="result"></div>
+
+  <script>
+    function calculate() {
+      // Get input values
+      const x1 = parseInt(document.getElementById('x[1]').value);
+      const x2 = parseFloat(document.getElementById('x[2]').value);
+      const x3 = parseFloat(document.getElementById('x[3]').value);
+      const x4 = parseFloat(document.getElementById('x[4]').value);
+      const x5 = parseFloat(document.getElementById('x[5]').value);
+      const x6 = parseFloat(document.getElementById('x[6]').value);
+      const x7 = parseFloat(document.getElementById('x[7]').value);
+      const x8 = parseFloat(document.getElementById('x[8]').value);
+      const x9 = parseFloat(document.getElementById('x[9]').value);
+      const x10 = parseFloat(document.getElementById('x[10]').value);
+
+      // Declare variables
+      let y = [];
+
+      // Conditions
+      let a = (100 * x2 + 25 * x3 + 700 * x4 + 100 * x5 + 125 * x6 + 250 * x7 + 25 * x8 + 100 * x9 + 25 * x10) / 25;
+      if (x7 >= 50 || (x7 >= 30 && x4 >= 5)) {
+        y[1] = 1.2 * (100 * x2 + 25 * x3 + 700 * x4 + 100 * x5 + 125 * x6 + 250 * x7 + 25 * x8 + 100 * x9 + 25 * x10);
+      } else {
+        y[1] = (100 * x2 + 25 * x3 + 700 * x4 + 100 * x5 + 125 * x6 + 250 * x7 + 25 * x8 + 100 * x9 + 25 * x10);
+      }
+
+      if (a > 300 && a <= 450) {
+        y[2] = 2000;
+      } else if (a > 450) {
+        y[2] = 4000;
+      } else {
+        y[2] = 0;
+      }
+
+      y[3] = (y[1] + y[2] - x1) / x1 * 100;
+      y[4] = (12 * y[1] + 3 * y[2] - x1) / x1 * 100;
+
+      // Display result
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `
+        <h3>Results:</h3>
+        <p><span class="highlight">Expected base payout per month (Rs.) :</span> Rs.${y[1].toFixed(2)}</p>
+        <p><span class="highlight">Handholding Support per month (till March 2024) (Rs.):</span> Rs.${y[2].toFixed(2)}</p>
+        <p><span class="highlight">Monthly ROI (in percentage):</span> ${y[3].toFixed(2)}%</p>
+        <p><span class="highlight">Yearly ROI (in percentage):</span> ${y[4].toFixed(2)}%</p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
