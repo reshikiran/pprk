@@ -32,6 +32,12 @@
         form {
             margin-bottom: 20px;
         }
+
+        #transactionLog {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -40,72 +46,72 @@
 
 <table>
     <tr>
-        <th>Team Member</th>
+        <th>Agent</th>
         <th>Stock Amount</th>
     </tr>
     <tr id="teamLeaderRow">
-        <td>Team Leader (x)</td>
+        <td>ASM (x)</td>
         <td id="teamLeaderStock">0</td>
     </tr>
-    <!-- Rows for other team members -->
+    <!-- Rows for other Agents -->
     <tr>
-        <td>Team Member (y1)</td>
+        <td>Agent (y1)</td>
         <td id="y1Stock">0</td>
     </tr>
     <tr>
-        <td>Team Member (y2)</td>
+        <td>Agent (y2)</td>
         <td id="y2Stock">0</td>
     </tr>
     <tr>
-        <td>Team Member (y3)</td>
+        <td>Agent (y3)</td>
         <td id="y3Stock">0</td>
     </tr>
     <tr>
-        <td>Team Member (y4)</td>
+        <td>Agent (y4)</td>
         <td id="y4Stock">0</td>
     </tr>
     <tr>
-        <td>Team Member (y5)</td>
+        <td>Agent (y5)</td>
         <td id="y5Stock">0</td>
     </tr>
     <tr>
-        <td>Team Member (y6)</td>
+        <td>Agent (y6)</td>
         <td id="y6Stock">0</td>
     </tr>
     <tr>
-        <td>Team Member (y7)</td>
+        <td>Agent (y7)</td>
         <td id="y7Stock">0</td>
     </tr>
     <tr>
-        <td>Team Member (y8)</td>
+        <td>Agent (y8)</td>
         <td id="y8Stock">0</td>
     </tr>
     <tr>
-        <td>Team Member (y9)</td>
+        <td>Agent (y9)</td>
         <td id="y9Stock">0</td>
     </tr>
     <tr>
-        <td>Team Member (y10)</td>
+        <td>Agent (y10)</td>
         <td id="y10Stock">0</td>
     </tr>
-    <!-- Add row for new team member (y11) -->
+    <!-- Add row for new Agent (y11) -->
     <tr>
-        <td>Team Member (y11)</td>
+        <td>Agent (y11)</td>
         <td id="y11Stock">0</td>
     </tr>
-    <!-- End of rows for other team members -->
+    <!-- End of rows for other Agents -->
 </table>
 
 <form id="addStockForm">
-    <label for="stockAmount">Add Stock for Team Leader:</label>
+    <label for="stockAmount">Add Stock for ASM:</label>
     <input type="number" id="stockAmount" name="stockAmount" required>
     <button type="button" onclick="addStock()">Add Stock</button>
 </form>
 
 <form id="transferStockToForm">
-    <label for="transferTo">Transfer Stock to Team Member:</label>
+    <label for="transferTo">Transfer Stock to Agent:</label>
     <select id="transferTo" name="transferTo" required>
-        <option value="" disabled selected>Select Team Member</option>
+        <option value="" disabled selected>Select Agent</option>
         <option value="y1">y1</option>
         <option value="y2">y2</option>
         <option value="y3">y3</option>
@@ -117,7 +123,7 @@
         <option value="y9">y9</option>
         <option value="y10">y10</option>
         <option value="y11">y11</option>
-        <!-- Add more options for other team members -->
+        <!-- Add more options for other Agents -->
     </select>
     <label for="transferAmount">Transfer Amount:</label>
     <input type="number" id="transferAmount" name="transferAmount" required>
@@ -125,9 +131,9 @@
 </form>
 
 <form id="transferStockFromForm">
-    <label for="transferFrom">Transfer Stock from Team Member:</label>
+    <label for="transferFrom">Transfer Stock from Agent:</label>
     <select id="transferFrom" name="transferFrom" required>
-        <option value="" disabled selected>Select Team Member</option>
+        <option value="" disabled selected>Select Agent</option>
         <option value="y1">y1</option>
         <option value="y2">y2</option>
         <option value="y3">y3</option>
@@ -139,12 +145,17 @@
         <option value="y9">y9</option>
         <option value="y10">y10</option>
         <option value="y11">y11</option>
-        <!-- Add more options for other team members -->
+        <!-- Add more options for other Agents -->
     </select>
     <label for="transferAmountFrom">Transfer Amount:</label>
     <input type="number" id="transferAmountFrom" name="transferAmountFrom" required>
     <button type="button" onclick="transferStock('from')">Transfer Stock</button>
 </form>
+
+<div id="transactionLog">
+    <h2>Transaction Log</h2>
+    <ul id="logList"></ul>
+</div>
 
 <script>
     // Function to get data from local storage
@@ -159,6 +170,7 @@
     }
 
     let teamLeaderStock = getDataFromLocalStorage('teamLeaderStock') || 0;
+    let transactionLog = getDataFromLocalStorage('transactionLog') || [];
 
     function addStock() {
         const stockAmount = parseInt(document.getElementById('stockAmount').value);
@@ -167,6 +179,9 @@
             updateStock('teamLeaderStock', teamLeaderStock);
             saveDataToLocalStorage('teamLeaderStock', teamLeaderStock);
             document.getElementById('stockAmount').value = '';
+
+            const logMessage = getLogMessage(`Added ${stockAmount} stock to ASM`);
+            logTransaction(logMessage);
         } else {
             alert('Please enter a valid stock amount.');
         }
@@ -191,6 +206,9 @@
 
                 document.getElementById(transferElement).value = '';
                 document.getElementById(transferAmountElement).value = '';
+
+                const logMessage = getLogMessage(`Transferred ${transferAmount} stock from ASM to ${transferToFrom}`);
+                logTransaction(logMessage);
             } else if (direction === 'from') {
                 const memberStock = getDataFromLocalStorage(`${transferToFrom}Stock`) || 0;
                 if (transferAmount <= memberStock) {
@@ -203,14 +221,17 @@
 
                     document.getElementById(transferElement).value = '';
                     document.getElementById(transferAmountElement).value = '';
+
+                    const logMessage = getLogMessage(`Transferred ${transferAmount} stock from ${transferToFrom} to ASM`);
+                    logTransaction(logMessage);
                 } else {
-                    alert('Transfer amount exceeds Team Member stock.');
+                    alert('Transfer amount exceeds Agent stock.');
                 }
             } else {
-                alert('Please enter a valid transfer amount for Team Leader.');
+                alert('Please enter a valid transfer amount for ASM.');
             }
         } else {
-            alert('Please select a team member and enter a valid transfer amount.');
+            alert('Please select a Agent and enter a valid transfer amount.');
         }
     }
 
@@ -218,15 +239,42 @@
         document.getElementById(elementId).innerText = value;
     }
 
-    // Initialize stock values on page load
+    function logTransaction(message) {
+        transactionLog.push(message);
+        saveDataToLocalStorage('transactionLog', transactionLog);
+
+        const logList = document.getElementById('logList');
+        const listItem = document.createElement('li');
+        listItem.appendChild(document.createTextNode(message));
+        logList.appendChild(listItem);
+    }
+
+    function getLogMessage(action) {
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+        const formattedTime = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+        return `[${formattedDate} ${formattedTime}] ${action}`;
+    }
+
+    // Initialize stock values and log on page load
     window.onload = function () {
         updateStock('teamLeaderStock', teamLeaderStock);
         for (let i = 1; i <= 11; i++) {
             const memberStock = getDataFromLocalStorage(`y${i}Stock`) || 0;
             updateStock(`y${i}Stock`, memberStock);
         }
+
+        // Display transaction log on page load
+        const logList = document.getElementById('logList');
+        transactionLog.forEach(message => {
+            const listItem = document.createElement('li');
+            listItem.appendChild(document.createTextNode(message));
+            logList.appendChild(listItem);
+        });
     }
 </script>
 
 </body>
 </html>
+
+
