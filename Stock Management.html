@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Stock Management System</h1>
+
+<table>
+    <tr>
+        <th>Team Member</th>
+        <th>Stock Amount</th>
+    </tr>
+    <tr id="teamLeaderRow">
+        <td>Team Leader (x)</td>
+        <td id="teamLeaderStock">0</td>
+    </tr>
+    <!-- Rows for other team members -->
+    <tr>
+        <td>Team Member (y1)</td>
+        <td id="y1Stock">0</td>
+    </tr>
+    <tr>
+        <td>Team Member (y2)</td>
+        <td id="y2Stock">0</td>
+    </tr>
+    <tr>
+        <td>Team Member (y3)</td>
+        <td id="y3Stock">0</td>
+    </tr>
+    <tr>
+        <td>Team Member (y4)</td>
+        <td id="y4Stock">0</td>
+    </tr>
+    <tr>
+        <td>Team Member (y5)</td>
+        <td id="y5Stock">0</td>
+    </tr>
+    <tr>
+        <td>Team Member (y6)</td>
+        <td id="y6Stock">0</td>
+    </tr>
+    <tr>
+        <td>Team Member (y7)</td>
+        <td id="y7Stock">0</td>
+    </tr>
+    <tr>
+        <td>Team Member (y8)</td>
+        <td id="y8Stock">0</td>
+    </tr>
+    <tr>
+        <td>Team Member (y9)</td>
+        <td id="y9Stock">0</td>
+    </tr>
+    <tr>
+        <td>Team Member (y10)</td>
+        <td id="y10Stock">0</td>
+    </tr>
+    <!-- Add row for new team member (y11) -->
+    <tr>
+        <td>Team Member (y11)</td>
+        <td id="y11Stock">0</td>
+    </tr>
+    <!-- End of rows for other team members -->
+</table>
+
+<form id="addStockForm">
+    <label for="stockAmount">Add Stock for Team Leader:</label>
+    <input type="number" id="stockAmount" name="stockAmount" required>
+    <button type="button" onclick="addStock()">Add Stock</button>
+</form>
+
+<form id="transferStockToForm">
+    <label for="transferTo">Transfer Stock to Team Member:</label>
+    <select id="transferTo" name="transferTo" required>
+        <option value="" disabled selected>Select Team Member</option>
+        <option value="y1">y1</option>
+        <option value="y2">y2</option>
+        <option value="y3">y3</option>
+        <option value="y4">y4</option>
+        <option value="y5">y5</option>
+        <option value="y6">y6</option>
+        <option value="y7">y7</option>
+        <option value="y8">y8</option>
+        <option value="y9">y9</option>
+        <option value="y10">y10</option>
+        <option value="y11">y11</option>
+        <!-- Add more options for other team members -->
+    </select>
+    <label for="transferAmount">Transfer Amount:</label>
+    <input type="number" id="transferAmount" name="transferAmount" required>
+    <button type="button" onclick="transferStock('to')">Transfer Stock</button>
+</form>
+
+<form id="transferStockFromForm">
+    <label for="transferFrom">Transfer Stock from Team Member:</label>
+    <select id="transferFrom" name="transferFrom" required>
+        <option value="" disabled selected>Select Team Member</option>
+        <option value="y1">y1</option>
+        <option value="y2">y2</option>
+        <option value="y3">y3</option>
+        <option value="y4">y4</option>
+        <option value="y5">y5</option>
+        <option value="y6">y6</option>
+        <option value="y7">y7</option>
+        <option value="y8">y8</option>
+        <option value="y9">y9</option>
+        <option value="y10">y10</option>
+        <option value="y11">y11</option>
+        <!-- Add more options for other team members -->
+    </select>
+    <label for="transferAmountFrom">Transfer Amount:</label>
+    <input type="number" id="transferAmountFrom" name="transferAmountFrom" required>
+    <button type="button" onclick="transferStock('from')">Transfer Stock</button>
+</form>
+
+<script>
+    // Function to get data from local storage
+    function getDataFromLocalStorage(key) {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+    }
+
+    // Function to save data to local storage
+    function saveDataToLocalStorage(key, data) {
+        localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    let teamLeaderStock = getDataFromLocalStorage('teamLeaderStock') || 0;
+
+    function addStock() {
+        const stockAmount = parseInt(document.getElementById('stockAmount').value);
+        if (!isNaN(stockAmount) && stockAmount > 0) {
+            teamLeaderStock += stockAmount;
+            updateStock('teamLeaderStock', teamLeaderStock);
+            saveDataToLocalStorage('teamLeaderStock', teamLeaderStock);
+            document.getElementById('stockAmount').value = '';
+        } else {
+            alert('Please enter a valid stock amount.');
+        }
+    }
+
+    function transferStock(direction) {
+        const transferElement = direction === 'to' ? 'transferTo' : 'transferFrom';
+        const transferAmountElement = direction === 'to' ? 'transferAmount' : 'transferAmountFrom';
+
+        const transferToFrom = document.getElementById(transferElement).value;
+        const transferAmount = parseInt(document.getElementById(transferAmountElement).value);
+
+        if (transferToFrom && !isNaN(transferAmount) && transferAmount > 0) {
+            if (direction === 'to' && transferAmount <= teamLeaderStock) {
+                teamLeaderStock -= transferAmount;
+                updateStock('teamLeaderStock', teamLeaderStock);
+                saveDataToLocalStorage('teamLeaderStock', teamLeaderStock);
+
+                const memberStock = getDataFromLocalStorage(`${transferToFrom}Stock`) || 0;
+                saveDataToLocalStorage(`${transferToFrom}Stock`, memberStock + transferAmount);
+                updateStock(`${transferToFrom}Stock`, memberStock + transferAmount);
+
+                document.getElementById(transferElement).value = '';
+                document.getElementById(transferAmountElement).value = '';
+            } else if (direction === 'from') {
+                const memberStock = getDataFromLocalStorage(`${transferToFrom}Stock`) || 0;
+                if (transferAmount <= memberStock) {
+                    teamLeaderStock += transferAmount;
+                    updateStock('teamLeaderStock', teamLeaderStock);
+                    saveDataToLocalStorage('teamLeaderStock', teamLeaderStock);
+
+                    saveDataToLocalStorage(`${transferToFrom}Stock`, memberStock - transferAmount);
+                    updateStock(`${transferToFrom}Stock`, memberStock - transferAmount);
+
+                    document.getElementById(transferElement).value = '';
+                    document.getElementById(transferAmountElement).value = '';
+                } else {
+                    alert('Transfer amount exceeds Team Member stock.');
+                }
+            } else {
+                alert('Please enter a valid transfer amount for Team Leader.');
+            }
+        } else {
+            alert('Please select a team member and enter a valid transfer amount.');
+        }
+    }
+
+    function updateStock(elementId, value) {
+        document.getElementById(elementId).innerText = value;
+    }
+
+    // Initialize stock values on page load
+    window.onload = function () {
+        updateStock('teamLeaderStock', teamLeaderStock);
+        for (let i = 1; i <= 11; i++) {
+            const memberStock = getDataFromLocalStorage(`y${i}Stock`) || 0;
+            updateStock(`y${i}Stock`, memberStock);
+        }
+    }
+</script>
+
+</body>
+</html>
