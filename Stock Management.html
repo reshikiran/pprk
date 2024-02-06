@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Management System</title>
+    <title>Collateral Management System</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,74 +42,74 @@
 </head>
 <body>
 
-<h1>Stock Management System</h1>
+<h1>Collateral Management System</h1>
 
 <table>
     <tr>
         <th>Agent</th>
-        <th>Stock Amount</th>
+        <th>Collateral Amount</th>
     </tr>
     <tr id="teamLeaderRow">
         <td>ASM (x)</td>
-        <td id="teamLeaderStock">0</td>
+        <td id="teamLeaderCollateral">0</td>
     </tr>
     <!-- Rows for other Agents -->
     <tr>
         <td>Agent (y1)</td>
-        <td id="y1Stock">0</td>
+        <td id="y1Collateral">0</td>
     </tr>
     <tr>
         <td>Agent (y2)</td>
-        <td id="y2Stock">0</td>
+        <td id="y2Collateral">0</td>
     </tr>
     <tr>
         <td>Agent (y3)</td>
-        <td id="y3Stock">0</td>
+        <td id="y3Collateral">0</td>
     </tr>
     <tr>
         <td>Agent (y4)</td>
-        <td id="y4Stock">0</td>
+        <td id="y4Collateral">0</td>
     </tr>
     <tr>
         <td>Agent (y5)</td>
-        <td id="y5Stock">0</td>
+        <td id="y5Collateral">0</td>
     </tr>
     <tr>
         <td>Agent (y6)</td>
-        <td id="y6Stock">0</td>
+        <td id="y6Collateral">0</td>
     </tr>
     <tr>
         <td>Agent (y7)</td>
-        <td id="y7Stock">0</td>
+        <td id="y7Collateral">0</td>
     </tr>
     <tr>
         <td>Agent (y8)</td>
-        <td id="y8Stock">0</td>
+        <td id="y8Collateral">0</td>
     </tr>
     <tr>
         <td>Agent (y9)</td>
-        <td id="y9Stock">0</td>
+        <td id="y9Collateral">0</td>
     </tr>
     <tr>
         <td>Agent (y10)</td>
-        <td id="y10Stock">0</td>
+        <td id="y10Collateral">0</td>
     </tr>
     <!-- Add row for new Agent (y11) -->
     <tr>
         <td>Agent (y11)</td>
-        <td id="y11Stock">0</td>
+        <td id="y11Collateral">0</td>
     </tr>
     <!-- End of rows for other Agents -->
 </table>
 
-<form id="addStockForm">
-    <label for="stockAmount">Add Stock for ASM:</label>
-    <input type="number" id="stockAmount" name="stockAmount" required>
-    <button type="button" onclick="addStock()">Add Stock</button>
+<form id="addCollateralForm">
+    <label for="CollateralAmount">Add Collateral for ASM:</label>
+    <input type="number" id="CollateralAmount" name="CollateralAmount" required>
+    <button type="button" onclick="addCollateral()">Add Collateral</button>
 </form>
 
-<form id="transferStockToForm">
-    <label for="transferTo">Transfer Stock to Agent:</label>
+<form id="transferCollateralToForm">
+    <label for="transferTo">Transfer Collateral to Agent:</label>
     <select id="transferTo" name="transferTo" required>
         <option value="" disabled selected>Select Agent</option>
         <option value="y1">y1</option>
@@ -127,11 +127,11 @@
     </select>
     <label for="transferAmount">Transfer Amount:</label>
     <input type="number" id="transferAmount" name="transferAmount" required>
-    <button type="button" onclick="transferStock('to')">Transfer Stock</button>
+    <button type="button" onclick="transferCollateral('to')">Transfer Collateral</button>
 </form>
 
-<form id="transferStockFromForm">
-    <label for="transferFrom">Transfer Stock from Agent:</label>
+<form id="transferCollateralFromForm">
+    <label for="transferFrom">Transfer Collateral from Agent:</label>
     <select id="transferFrom" name="transferFrom" required>
         <option value="" disabled selected>Select Agent</option>
         <option value="y1">y1</option>
@@ -149,7 +149,7 @@
     </select>
     <label for="transferAmountFrom">Transfer Amount:</label>
     <input type="number" id="transferAmountFrom" name="transferAmountFrom" required>
-    <button type="button" onclick="transferStock('from')">Transfer Stock</button>
+    <button type="button" onclick="transferCollateral('from')">Transfer Collateral</button>
 </form>
 
 <div id="transactionLog">
@@ -169,25 +169,25 @@
         localStorage.setItem(key, JSON.stringify(data));
     }
 
-    let teamLeaderStock = getDataFromLocalStorage('teamLeaderStock') || 0;
+    let teamLeaderCollateral = getDataFromLocalStorage('teamLeaderCollateral') || 0;
     let transactionLog = getDataFromLocalStorage('transactionLog') || [];
 
-    function addStock() {
-        const stockAmount = parseInt(document.getElementById('stockAmount').value);
-        if (!isNaN(stockAmount) && stockAmount > 0) {
-            teamLeaderStock += stockAmount;
-            updateStock('teamLeaderStock', teamLeaderStock);
-            saveDataToLocalStorage('teamLeaderStock', teamLeaderStock);
-            document.getElementById('stockAmount').value = '';
+    function addCollateral() {
+        const CollateralAmount = parseInt(document.getElementById('CollateralAmount').value);
+        if (!isNaN(CollateralAmount) && CollateralAmount > 0) {
+            teamLeaderCollateral += CollateralAmount;
+            updateCollateral('teamLeaderCollateral', teamLeaderCollateral);
+            saveDataToLocalStorage('teamLeaderCollateral', teamLeaderCollateral);
+            document.getElementById('CollateralAmount').value = '';
 
-            const logMessage = getLogMessage(`Added ${stockAmount} stock to ASM`);
+            const logMessage = getLogMessage(`Added ${CollateralAmount} Collateral to ASM`);
             logTransaction(logMessage);
         } else {
-            alert('Please enter a valid stock amount.');
+            alert('Please enter a valid Collateral amount.');
         }
     }
 
-    function transferStock(direction) {
+    function transferCollateral(direction) {
         const transferElement = direction === 'to' ? 'transferTo' : 'transferFrom';
         const transferAmountElement = direction === 'to' ? 'transferAmount' : 'transferAmountFrom';
 
@@ -195,37 +195,37 @@
         const transferAmount = parseInt(document.getElementById(transferAmountElement).value);
 
         if (transferToFrom && !isNaN(transferAmount) && transferAmount > 0) {
-            if (direction === 'to' && transferAmount <= teamLeaderStock) {
-                teamLeaderStock -= transferAmount;
-                updateStock('teamLeaderStock', teamLeaderStock);
-                saveDataToLocalStorage('teamLeaderStock', teamLeaderStock);
+            if (direction === 'to' && transferAmount <= teamLeaderCollateral) {
+                teamLeaderCollateral -= transferAmount;
+                updateCollateral('teamLeaderCollateral', teamLeaderCollateral);
+                saveDataToLocalStorage('teamLeaderCollateral', teamLeaderCollateral);
 
-                const memberStock = getDataFromLocalStorage(`${transferToFrom}Stock`) || 0;
-                saveDataToLocalStorage(`${transferToFrom}Stock`, memberStock + transferAmount);
-                updateStock(`${transferToFrom}Stock`, memberStock + transferAmount);
+                const memberCollateral = getDataFromLocalStorage(`${transferToFrom}Collateral`) || 0;
+                saveDataToLocalStorage(`${transferToFrom}Collateral`, memberCollateral + transferAmount);
+                updateCollateral(`${transferToFrom}Collateral`, memberCollateral + transferAmount);
 
                 document.getElementById(transferElement).value = '';
                 document.getElementById(transferAmountElement).value = '';
 
-                const logMessage = getLogMessage(`Transferred ${transferAmount} stock from ASM to ${transferToFrom}`);
+                const logMessage = getLogMessage(`Transferred ${transferAmount} Collateral from ASM to ${transferToFrom}`);
                 logTransaction(logMessage);
             } else if (direction === 'from') {
-                const memberStock = getDataFromLocalStorage(`${transferToFrom}Stock`) || 0;
-                if (transferAmount <= memberStock) {
-                    teamLeaderStock += transferAmount;
-                    updateStock('teamLeaderStock', teamLeaderStock);
-                    saveDataToLocalStorage('teamLeaderStock', teamLeaderStock);
+                const memberCollateral = getDataFromLocalStorage(`${transferToFrom}Collateral`) || 0;
+                if (transferAmount <= memberCollateral) {
+                    teamLeaderCollateral += transferAmount;
+                    updateCollateral('teamLeaderCollateral', teamLeaderCollateral);
+                    saveDataToLocalStorage('teamLeaderCollateral', teamLeaderCollateral);
 
-                    saveDataToLocalStorage(`${transferToFrom}Stock`, memberStock - transferAmount);
-                    updateStock(`${transferToFrom}Stock`, memberStock - transferAmount);
+                    saveDataToLocalStorage(`${transferToFrom}Collateral`, memberCollateral - transferAmount);
+                    updateCollateral(`${transferToFrom}Collateral`, memberCollateral - transferAmount);
 
                     document.getElementById(transferElement).value = '';
                     document.getElementById(transferAmountElement).value = '';
 
-                    const logMessage = getLogMessage(`Transferred ${transferAmount} stock from ${transferToFrom} to ASM`);
+                    const logMessage = getLogMessage(`Transferred ${transferAmount} Collateral from ${transferToFrom} to ASM`);
                     logTransaction(logMessage);
                 } else {
-                    alert('Transfer amount exceeds Agent stock.');
+                    alert('Transfer amount exceeds Agent Collateral.');
                 }
             } else {
                 alert('Please enter a valid transfer amount for ASM.');
@@ -235,7 +235,7 @@
         }
     }
 
-    function updateStock(elementId, value) {
+    function updateCollateral(elementId, value) {
         document.getElementById(elementId).innerText = value;
     }
 
@@ -256,12 +256,12 @@
         return `[${formattedDate} ${formattedTime}] ${action}`;
     }
 
-    // Initialize stock values and log on page load
+    // Initialize Collateral values and log on page load
     window.onload = function () {
-        updateStock('teamLeaderStock', teamLeaderStock);
+        updateCollateral('teamLeaderCollateral', teamLeaderCollateral);
         for (let i = 1; i <= 11; i++) {
-            const memberStock = getDataFromLocalStorage(`y${i}Stock`) || 0;
-            updateStock(`y${i}Stock`, memberStock);
+            const memberCollateral = getDataFromLocalStorage(`y${i}Collateral`) || 0;
+            updateCollateral(`y${i}Collateral`, memberCollateral);
         }
 
         // Display transaction log on page load
