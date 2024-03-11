@@ -20,13 +20,36 @@
             color: white;
             text-align: center;
             padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         h1 {
             font-size: 36px;
             margin: 0;
+	align-items: center;
+        }
+        .settings-container {
+            background-color: lightgrey;
+            padding: 0.5px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: right;
+            justify-content: flex-end; /* Adjusted alignment to the right */
         }
 
+        .setting-item {
+            margin-left: 20px; /* Adjusted margin to create space between items */
+        }
+
+        .disabled-button {
+            background-color: #EF5350;
+            color: white;
+            padding: 5px 5px;
+            border: none;
+            border-radius: 2px;
+        }
         .main-content {
             display: flex;
             flex-wrap: wrap;
@@ -116,7 +139,17 @@
             justify-content: center;
             align-items: center;
         }
-
+   .add-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
         .popup-content {
             background: white;
             padding: 20px;
@@ -141,6 +174,36 @@
         button.cancel {
             background-color: #ccc;
         }
+
+        .feature-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: lightgrey;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .stores-heading {
+            font-size: 25px;
+            color: black;
+	    margin-left: 10px;
+            margin-right: auto;
+            font-weight: bold;
+        }
+
+        .blue-box {
+            background-color: blue;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .blue-box.add-store {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -148,6 +211,21 @@
     <div class="header">
         <h1>PhonePe Business</h1>
     </div>
+        <div class="feature-container">
+            <div class="stores-heading">Stores</div>
+	            <div class="setting-item">
+            <p><strong>Refund</strong><button class="disabled-button">Disabled</button></p>
+        </div>
+
+        <div class="setting-item">
+            <p><strong>Monthly Report</strong><button class="disabled-button">Disabled</button></p>
+        </div>
+
+            <a href="Store Summary.csv" download>
+            <button class="blue-box" ">Download Store Data</button>
+            </a>
+		<button class="blue-box add-store" onclick="showAddStoreDialog()">Add Store</button>
+        </div>
 
     <div class="filter-container">
         <label for="sort">Sort by TPV:</label>
@@ -236,9 +314,28 @@
 
     <div class="delete-popup" id="deleteConfirmationPopup">
         <div class="popup-content">
-            <p>Delete request sent</p>
+            <p>Delete request sent. Our team will contact you shortly</p>
             <div class="popup-buttons">
                 <button class="popup-button" onclick="closePopup()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="add-popup" id="addPopup">
+        <div class="popup-content">
+            <p>Are you sure you want to add a store?</p>
+            <div class="popup-buttons">
+                <button class="popup-button" onclick="addStore('yes')">Yes</button>
+                <button class="popup-button cancel" onclick="addStore('no')">No</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="add-popup" id="addConfirmationPopup">
+        <div class="popup-content">
+            <p>Add store request sent. Our team will contact you shortly</p>
+            <div class="popup-buttons">
+                <button class="popup-button" onclick="closePopup2()">OK</button>
             </div>
         </div>
     </div>
@@ -314,6 +411,20 @@
             }
         }
 
+        function showAddPopup() {
+            document.getElementById('addPopup').style.display = 'flex';
+        }
+
+        function addStore(response) {
+            const storeName = document.getElementById('addPopup');
+            closePopup2();
+
+            if (response === 'yes') {
+                // Logic to delete the store or send delete request
+                showConfirmationPopup2();
+            }
+        }
+
         function showConfirmationPopup() {
             document.getElementById('deleteConfirmationPopup').style.display = 'flex';
         }
@@ -321,6 +432,24 @@
         function closePopup() {
             document.getElementById('deletePopup').style.display = 'none';
             document.getElementById('deleteConfirmationPopup').style.display = 'none';
+        }
+
+       function showConfirmationPopup2() {
+            document.getElementById('addConfirmationPopup').style.display = 'flex';
+        }
+
+        function closePopup2() {
+            document.getElementById('addPopup').style.display = 'none';
+            document.getElementById('addConfirmationPopup').style.display = 'none';
+        }
+
+        function downloadStoreData() {
+            alert("Downloading Store Summary.csv");
+        }
+
+        function showAddStoreDialog() {
+            document.getElementById('addPopup').style.display = 'flex';
+            document.getElementById('popupText').innerHTML = 'Are you sure you want to add a store?';
         }
     </script>
 
