@@ -51,8 +51,8 @@ function handleFileSelect(event) {
             fetchCoordinates('Noida')
             .then(noidaCoordsResponse => {
                 noidaCoords = noidaCoordsResponse;
-                // Display map and details once all coordinates are fetched
-                displayMapAndDetails();
+                // Display map and markers once all coordinates are fetched
+                displayMapAndMarkers();
             })
             .catch(error => {
                 console.error('Error fetching Noida coordinates:', error);
@@ -78,7 +78,7 @@ function fetchCoordinates(location) {
     });
 }
 
-function displayMapAndDetails() {
+function displayMapAndMarkers() {
     mapboxgl.accessToken = 'pk.eyJ1IjoicmVzaGlraXJhbm5jIiwiYSI6ImNsdW1ocXBjMzE5YTcybGxtYTQxZHV0ZGgifQ.OylEs7tlZBA-pzw2z0_TYA'; // Replace with your Mapbox access token
     const map = new mapboxgl.Map({
         container: 'map',
@@ -87,43 +87,40 @@ function displayMapAndDetails() {
         zoom: 5 // Adjust the zoom level as needed
     });
 
+    // Create an object to store markers with the same coordinates
+    const markers = {};
+
     originalSheetData.forEach((row, index) => {
+        const name = row[0];
         const location = row[1];
         const latitude = coordinates[index][1];
         const longitude = coordinates[index][0];
         const distance = calculateDistance(latitude, longitude, noidaCoords[1], noidaCoords[0]);
         const typeOfMeeting = distance > 50 ? 'Online' : 'Offline';
 
-        const popupContent = `<h3>${row[0]}</h3>
-                              <p><strong>Location:</strong> ${location}</p>
-                              <p><strong>Latitude:</strong> ${latitude}</p>
-                              <p><strong>Longitude:</strong> ${longitude}</p>
-                              <p><strong>Distance to Noida (km):</strong> ${distance.toFixed(2)}</p>
-                              <p><strong>Type of Meeting:</strong> ${typeOfMeeting}</p>`;
+        // If marker with the same coordinates exists, add name to its list
+        if (!markers[latitude + ',' + longitude]) {
+            markers[latitude + ',' + longitude] = [{ name, distance, typeOfMeeting }];
+        } else {
+            markers[latitude + ',' + longitude].push({ name, distance, typeOfMeeting });
+        }
 
+        // Create popup content for the marker
+        let popupContent = `<h3>${location}</h3>`;
+        popupContent += `<p>Total Accounts: ${markers[latitude + ',' + longitude].length}</p>`;
+
+        markers[latitude + ',' + longitude].forEach(marker => {
+            popupContent += `<p><strong>Name:</strong> ${marker.name}</p>`;
+            popupContent += `<p><strong>Distance to Noida (km):</strong> ${marker.distance.toFixed(2)}</p>`;
+            popupContent += `<p><strong>Type of Meeting:</strong> ${marker.typeOfMeeting}</p>`;
+        });
+
+        // Create marker and bind popup
         new mapboxgl.Marker()
             .setLngLat([longitude, latitude])
             .setPopup(new mapboxgl.Popup().setHTML(popupContent))
             .addTo(map);
     });
-}
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of the earth in km
-    const dLat = deg2rad(lat2 - lat1);  // deg2rad below
-    const dLon = deg2rad(lon2 - lon1);
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2)
-        ;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c; // Distance in km
-    return d;
-}
-
-function deg2rad(deg) {
-    return deg * (Math.PI / 180)
 }
 
 function downloadExcel() {
@@ -146,6 +143,24 @@ function downloadExcel() {
     // Save the Excel file using FileSaver.js
     const blob = new Blob([wbout], { type: 'application/octet-stream' });
     saveAs(blob, 'Locations.xlsx');
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);  // deg2rad below
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        ;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c; // Distance in km
+    return d;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI / 180)
 }
 </script>
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.0/mapbox-gl.js"></script>
