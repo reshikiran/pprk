@@ -5,30 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Location from Excel</title>
 <style>
+    #map {
+        height: 500px;
+        width: 100%;
+    }
     #result {
         margin-top: 20px;
     }
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #f2f2f2;
+    #downloadBtn {
+        margin-top: 20px;
     }
 </style>
 </head>
 <body>
 <h2>Upload Excel File</h2>
 <input type="file" id="fileInput" accept=".xls,.xlsx">
+<div id="map"></div>
 <div id="result"></div>
+<button id="downloadBtn" onclick="downloadExcel()">Download Excel</button>
 
 <script>
 document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
+
+let originalSheetData;
+let coordinates;
+let noidaCoords;
 
 function handleFileSelect(event) {
     const file = event.target.files[0];
@@ -39,15 +40,24 @@ function handleFileSelect(event) {
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        originalSheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
         // Fetch coordinates for each location asynchronously
-        const promises = sheetData.map(row => fetchCoordinates(row[1]));
+        const promises = originalSheetData.map(row => fetchCoordinates(row[1]));
         Promise.all(promises)
-        .then(coordinates => {
-            // Generate table once all coordinates are fetched
-            const tableHTML = generateTable(sheetData, coordinates);
-            document.getElementById('result').innerHTML = tableHTML;
+        .then(coords => {
+            coordinates = coords;
+            // Get coordinates for Noida
+            fetchCoordinates('Noida')
+            .then(noidaCoordsResponse => {
+                noidaCoords = noidaCoordsResponse;
+                // Display map and details once all coordinates are fetched
+                displayMapAndDetails();
+            })
+            .catch(error => {
+                console.error('Error fetching Noida coordinates:', error);
+                document.getElementById('result').innerHTML = 'Error retrieving Noida coordinates. Please try again.';
+            });
         })
         .catch(error => {
             console.error('Error:', error);
@@ -63,28 +73,84 @@ function fetchCoordinates(location) {
     return fetch(url)
     .then(response => response.json())
     .then(data => {
-        const coordinates = data.features[0].center;
-        return coordinates;
+        const coords = data.features[0].center;
+        return coords;
     });
 }
 
-function generateTable(data, coordinates) {
-    let tableHTML = '<table>';
-    tableHTML += '<tr><th>Name</th><th>Location</th><th>Latitude</th><th>Longitude</th></tr>';
+function displayMapAndDetails() {
+    mapboxgl.accessToken = 'pk.eyJ1IjoicmVzaGlraXJhbm5jIiwiYSI6ImNsdW1ocXBjMzE5YTcybGxtYTQxZHV0ZGgifQ.OylEs7tlZBA-pzw2z0_TYA'; // Replace with your Mapbox access token
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [coordinates[0][0], coordinates[0][1]], // Center the map on the first location
+        zoom: 5 // Adjust the zoom level as needed
+    });
 
-    data.forEach((row, index) => {
+    originalSheetData.forEach((row, index) => {
+        const location = row[1];
+        const latitude = coordinates[index][1];
+        const longitude = coordinates[index][0];
+        const distance = calculateDistance(latitude, longitude, noidaCoords[1], noidaCoords[0]);
+        const typeOfMeeting = distance > 50 ? 'Online' : 'Offline';
+
+        const popupContent = `<h3>${row[0]}</h3>
+                              <p><strong>Location:</strong> ${location}</p>
+                              <p><strong>Latitude:</strong> ${latitude}</p>
+                              <p><strong>Longitude:</strong> ${longitude}</p>
+                              <p><strong>Distance to Noida (km):</strong> ${distance.toFixed(2)}</p>
+                              <p><strong>Type of Meeting:</strong> ${typeOfMeeting}</p>`;
+
+        new mapboxgl.Marker()
+            .setLngLat([longitude, latitude])
+            .setPopup(new mapboxgl.Popup().setHTML(popupContent))
+            .addTo(map);
+    });
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);  // deg2rad below
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        ;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c; // Distance in km
+    return d;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI / 180)
+}
+
+function downloadExcel() {
+    const header = ['Name', 'Location', 'Latitude', 'Longitude', 'Distance to Noida (km)', 'Type of Meeting'];
+    const data = originalSheetData.map((row, index) => {
         const name = row[0];
         const location = row[1];
         const latitude = coordinates[index][1];
         const longitude = coordinates[index][0];
-
-        tableHTML += `<tr><td>${name}</td><td>${location}</td><td>${latitude}</td><td>${longitude}</td></tr>`;
+        const distance = calculateDistance(latitude, longitude, noidaCoords[1], noidaCoords[0]);
+        const typeOfMeeting = distance > 50 ? 'Online' : 'Offline';
+        return [name, location, latitude, longitude, distance.toFixed(2), typeOfMeeting];
     });
+    const sheet = [header, ...data];
+    const ws = XLSX.utils.aoa_to_sheet(sheet);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Locations');
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
 
-    tableHTML += '</table>';
-    return tableHTML;
+    // Save the Excel file using FileSaver.js
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    saveAs(blob, 'Locations.xlsx');
 }
 </script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.6.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.6.0/mapbox-gl.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </body>
 </html>
