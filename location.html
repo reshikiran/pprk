@@ -4,19 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Location from Excel</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <style>
-    #map {
-        height: 400px;
+    #result {
+        margin-top: 20px;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
     }
 </style>
 </head>
 <body>
 <h2>Upload Excel File</h2>
 <input type="file" id="fileInput" accept=".xls,.xlsx">
-<div id="map"></div>
+<div id="result"></div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
 
@@ -36,11 +46,12 @@ function handleFileSelect(event) {
         Promise.all(promises)
         .then(coordinates => {
             // Generate table once all coordinates are fetched
-            generateMap(sheetData, coordinates);
+            const tableHTML = generateTable(sheetData, coordinates);
+            document.getElementById('result').innerHTML = tableHTML;
         })
         .catch(error => {
             console.error('Error:', error);
-            document.getElementById('map').innerHTML = 'Error retrieving location. Please try again.';
+            document.getElementById('result').innerHTML = 'Error retrieving location. Please try again.';
         });
     };
 
@@ -57,12 +68,9 @@ function fetchCoordinates(location) {
     });
 }
 
-function generateMap(data, coordinates) {
-    const map = L.map('map').setView([20.5937, 78.9629], 5); // Centered on India
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+function generateTable(data, coordinates) {
+    let tableHTML = '<table>';
+    tableHTML += '<tr><th>Name</th><th>Location</th><th>Latitude</th><th>Longitude</th></tr>';
 
     data.forEach((row, index) => {
         const name = row[0];
@@ -70,10 +78,11 @@ function generateMap(data, coordinates) {
         const latitude = coordinates[index][1];
         const longitude = coordinates[index][0];
 
-        L.marker([latitude, longitude]).addTo(map)
-        .bindPopup(`<b>${name}</b><br>${location}`)
-        .openPopup();
+        tableHTML += `<tr><td>${name}</td><td>${location}</td><td>${latitude}</td><td>${longitude}</td></tr>`;
     });
+
+    tableHTML += '</table>';
+    return tableHTML;
 }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
