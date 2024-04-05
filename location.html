@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Location from Excel</title>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <style>
     #map {
         height: 500px;
@@ -15,21 +16,50 @@
     #downloadBtn {
         margin-top: 20px;
     }
+    .base-marker {
+        width: 20px;
+        height: 20px;
+        background-color: red;
+        border-radius: 50%;
+        border: 2px solid white;
+        cursor: pointer;
+    }
 </style>
 </head>
 <body>
-<h2>Upload Excel File</h2>
-<input type="file" id="fileInput" accept=".xls,.xlsx">
-<div id="map"></div>
-<div id="result"></div>
-<button id="downloadBtn" onclick="downloadExcel()">Download Excel</button>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h2>Upload Excel File</h2>
+            <input type="file" id="fileInput" accept=".xls,.xlsx" class="form-control-file">
+            <br>
+            <label for="baseLocation">Enter Base Location:</label>
+            <input type="text" id="baseLocation" class="form-control">
+            <button onclick="calculateDistances()" class="btn btn-primary mt-2">Submit</button>
+            <div id="result" class="mt-4"></div>
+            <button id="downloadBtn" onclick="downloadExcel()" class="btn btn-success mt-2">Download Excel</button>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col">
+            <div id="map"></div>
+        </div>
+    </div>
+</div>
 
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.6.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.6.0/mapbox-gl.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
 document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
 
 let originalSheetData;
 let coordinates;
-let noidaCoords;
+let baseCoords;
 
 function handleFileSelect(event) {
     const file = event.target.files[0];
@@ -41,31 +71,33 @@ function handleFileSelect(event) {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         originalSheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    };
 
+    reader.readAsArrayBuffer(file);
+}
+
+function calculateDistances() {
+    const baseLocation = document.getElementById('baseLocation').value;
+    fetchCoordinates(baseLocation)
+    .then(baseCoordsResponse => {
+        baseCoords = baseCoordsResponse;
         // Fetch coordinates for each location asynchronously
         const promises = originalSheetData.map(row => fetchCoordinates(row[1]));
         Promise.all(promises)
         .then(coords => {
             coordinates = coords;
-            // Get coordinates for Noida
-            fetchCoordinates('Noida')
-            .then(noidaCoordsResponse => {
-                noidaCoords = noidaCoordsResponse;
-                // Display map and markers once all coordinates are fetched
-                displayMapAndMarkers();
-            })
-            .catch(error => {
-                console.error('Error fetching Noida coordinates:', error);
-                document.getElementById('result').innerHTML = 'Error retrieving Noida coordinates. Please try again.';
-            });
+            // Display map and markers once all coordinates are fetched
+            displayMapAndMarkers();
         })
         .catch(error => {
             console.error('Error:', error);
             document.getElementById('result').innerHTML = 'Error retrieving location. Please try again.';
         });
-    };
-
-    reader.readAsArrayBuffer(file);
+    })
+    .catch(error => {
+        console.error('Error fetching base location coordinates:', error);
+        document.getElementById('result').innerHTML = 'Error retrieving base location coordinates. Please try again.';
+    });
 }
 
 function fetchCoordinates(location) {
@@ -87,50 +119,62 @@ function displayMapAndMarkers() {
         zoom: 5 // Adjust the zoom level as needed
     });
 
+    // Add base location marker
+    new mapboxgl.Marker({
+        element: createBaseMarker()
+    })
+        .setLngLat([baseCoords[0], baseCoords[1]])
+        .addTo(map);
+
     // Create an object to store markers with the same coordinates
     const markers = {};
 
     originalSheetData.forEach((row, index) => {
-        const name = row[0];
         const location = row[1];
         const latitude = coordinates[index][1];
         const longitude = coordinates[index][0];
-        const distance = calculateDistance(latitude, longitude, noidaCoords[1], noidaCoords[0]);
+        const distance = calculateDistance(latitude, longitude, baseCoords[1], baseCoords[0]);
         const typeOfMeeting = distance > 50 ? 'Online' : 'Offline';
 
         // If marker with the same coordinates exists, add name to its list
         if (!markers[latitude + ',' + longitude]) {
-            markers[latitude + ',' + longitude] = [{ name, distance, typeOfMeeting }];
+            markers[latitude + ',' + longitude] = { location, distance, typeOfMeeting, names: [row[0]] };
         } else {
-            markers[latitude + ',' + longitude].push({ name, distance, typeOfMeeting });
+            markers[latitude + ',' + longitude].names.push(row[0]);
         }
+    });
 
-        // Create popup content for the marker
-        let popupContent = `<h3>${location}</h3>`;
-        popupContent += `<p>Total Accounts: ${markers[latitude + ',' + longitude].length}</p>`;
-
-        markers[latitude + ',' + longitude].forEach(marker => {
-            popupContent += `<p><strong>Name:</strong> ${marker.name}</p>`;
-            popupContent += `<p><strong>Distance to Noida (km):</strong> ${marker.distance.toFixed(2)}</p>`;
-            popupContent += `<p><strong>Type of Meeting:</strong> ${marker.typeOfMeeting}</p>`;
-        });
-
-        // Create marker and bind popup
+    // Add markers to the map
+    Object.keys(markers).forEach(key => {
+        const marker = markers[key];
+        const popupContent = `
+            <h5>${marker.location}</h5>
+            <p><strong>Total Accounts:</strong> ${marker.names.length}</p>
+            <p><strong>Distance to Base (km):</strong> ${marker.distance.toFixed(2)}</p>
+            <p><strong>Type of Meeting:</strong> ${marker.typeOfMeeting}</p>
+            <p><strong>Names:</strong> ${marker.names.join(', ')}</p>
+        `;
         new mapboxgl.Marker()
-            .setLngLat([longitude, latitude])
+            .setLngLat([parseFloat(key.split(',')[1]), parseFloat(key.split(',')[0])])
             .setPopup(new mapboxgl.Popup().setHTML(popupContent))
             .addTo(map);
     });
 }
 
+function createBaseMarker() {
+    const marker = document.createElement('div');
+    marker.className = 'base-marker';
+    return marker;
+}
+
 function downloadExcel() {
-    const header = ['Name', 'Location', 'Latitude', 'Longitude', 'Distance to Noida (km)', 'Type of Meeting'];
+    const header = ['Name', 'Location', 'Latitude', 'Longitude', 'Distance to Base (km)', 'Type of Meeting'];
     const data = originalSheetData.map((row, index) => {
         const name = row[0];
         const location = row[1];
         const latitude = coordinates[index][1];
         const longitude = coordinates[index][0];
-        const distance = calculateDistance(latitude, longitude, noidaCoords[1], noidaCoords[0]);
+        const distance = calculateDistance(latitude, longitude, baseCoords[1], baseCoords[0]);
         const typeOfMeeting = distance > 50 ? 'Online' : 'Offline';
         return [name, location, latitude, longitude, distance.toFixed(2), typeOfMeeting];
     });
@@ -163,9 +207,5 @@ function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
 </script>
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.6.0/mapbox-gl.js"></script>
-<link href="https://api.mapbox.com/mapbox-gl-js/v2.6.0/mapbox-gl.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </body>
 </html>
