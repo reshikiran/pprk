@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RKAM PJP</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+  }
+  .container {
+    width: 80%;
+    max-width: 800px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group input {
+    width: calc(100% - 10px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .form-group button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  table th {
+    background-color: #007bff;
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>RKAM PJP</h2>
+  <form id="rkamForm">
+    <div class="form-group">
+      <input type="file" id="excelFile" accept=".xlsx">
+    </div>
+    <div class="form-group">
+      <input type="text" id="fullName" placeholder="Enter your full name">
+    </div>
+    <div class="form-group">
+      <input type="text" id="pjpMonth" placeholder="Enter PJP month">
+    </div>
+    <div class="form-group">
+      <input type="text" id="baseLocation" placeholder="Enter Base Location">
+    </div>
+    <div class="form-group">
+      <button type="button" onclick="submitForm()">Submit</button>
+    </div>
+  </form>
+  <div id="outputTable"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+<script>
+  function submitForm() {
+    var fullName = document.getElementById('fullName').value;
+    var pjpMonth = document.getElementById('pjpMonth').value;
+    var baseLocation = document.getElementById('baseLocation').value;
+
+    var filePath = "C:\\Users\\reshikiran.nc\\Desktop\\RKAM Stint\\Deep Portfolio for web working.xlsx";
+
+    var req = new XMLHttpRequest();
+    req.open("GET", filePath, true);
+    req.responseType = "arraybuffer";
+
+    req.onload = function (e) {
+      var data = new Uint8Array(req.response);
+      var workbook = XLSX.read(data, {type: 'array'});
+      var sheetName = workbook.SheetNames[0];
+      var worksheet = workbook.Sheets[sheetName];
+      var htmlTable = XLSX.utils.sheet_to_html(worksheet);
+
+      document.getElementById('outputTable').innerHTML = htmlTable;
+    };
+
+    req.send();
+  }
+</script>
+</body>
+</html>
