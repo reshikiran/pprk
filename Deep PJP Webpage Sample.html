@@ -51,7 +51,7 @@
     cursor: pointer;
   }
   table {
-    width: 100%;
+    width: 50%;
     border-collapse: collapse;
     margin-top: 20px;
   }
@@ -96,18 +96,11 @@
     </form>
     <div id="outputTable"></div>
   </div>
-  <div class="map-container" id="map"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  var map = L.map('map').setView([51.505, -0.09], 13); // Initialize map
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
-
   function submitForm() {
     var fullName = document.getElementById('fullName').value;
     var pjpMonth = document.getElementById('pjpMonth').value;
@@ -136,7 +129,6 @@
         var cell = worksheet[cellRef];
         if (cell && cell.v) {
           var coordinates = cell.v.split(',').map(Number); // Assuming coordinates are comma-separated
-          var marker = L.marker(coordinates).addTo(map);
 
           // Add popup with details from Excel
           var popupContent = '';
@@ -151,7 +143,9 @@
               popupContent += '<strong>' + header + '</strong>: ' + cell.v + '<br>';
             }
           }
-          marker.bindPopup(popupContent);
+          // Display details in the outputTable div
+          var outputTable = document.getElementById('outputTable');
+          outputTable.innerHTML += '<div>' + popupContent + '</div>';
         }
       }
     };
