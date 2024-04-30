@@ -10,28 +10,29 @@
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
     background-color: #f4f4f4;
   }
   .container {
-    width: 80%;
-    max-width: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+  .form-container {
+    width: 45%;
+    max-width: 400px;
+    margin-right: 10px;
     background-color: #fff;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-  }
-  .form-container {
-    flex: 1;
-    padding-right: 10px;
   }
   .map-container {
-    flex: 1;
+    width: 45%;
     height: 400px; /* Adjust map height as needed */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
   .form-group {
     margin-bottom: 20px;
@@ -43,7 +44,8 @@
     border-radius: 5px;
   }
   .form-group button {
-    padding: 10px 20px;
+    width: 100%;
+    padding: 10px;
     background-color: #007bff;
     color: #fff;
     border: none;
@@ -51,7 +53,7 @@
     cursor: pointer;
   }
   table {
-    width: 50%;
+    width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
   }
@@ -65,12 +67,6 @@
     background-color: #007bff;
     color: #fff;
   }
-  #outputTable {
-    margin-top: 20px;
-    width: 100%;
-    height: 300px;
-    overflow-y: auto;
-  }
 </style>
 </head>
 <body>
@@ -78,9 +74,6 @@
   <div class="form-container">
     <h2>RKAM PJP</h2>
     <form id="rkamForm">
-      <div class="form-group">
-        <input type="file" id="excelFile" accept=".xlsx">
-      </div>
       <div class="form-group">
         <input type="text" id="fullName" placeholder="Enter your full name">
       </div>
@@ -96,6 +89,7 @@
     </form>
     <div id="outputTable"></div>
   </div>
+  <div class="map-container" id="map"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
@@ -121,6 +115,14 @@
 
       document.getElementById('outputTable').innerHTML = htmlTable;
 
+      // Initialize Leaflet map
+      var map = L.map('map').setView([0, 0], 2);
+
+      // Add tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
       // Get coordinates from 'HO location' column
       var range = XLSX.utils.decode_range(worksheet['!ref']);
       for (var R = range.s.r; R <= range.e.r; ++R) {
@@ -130,27 +132,30 @@
         if (cell && cell.v) {
           var coordinates = cell.v.split(',').map(Number); // Assuming coordinates are comma-separated
 
-          // Add popup with details from Excel
-          var popupContent = '';
-          for (var C = range.s.c; C <= range.e.c; ++C) {
-            var headerAddress = { c: C, r: 0 }; // Assuming headers are in the first row
-            var headerRef = XLSX.utils.encode_cell(headerAddress);
-            var header = worksheet[headerRef].v;
-            var cellAddress = { c: C, r: R };
-            var cellRef = XLSX.utils.encode_cell(cellAddress);
-            var cell = worksheet[cellRef];
-            if (cell && cell.v) {
-              popupContent += '<strong>' + header + '</strong>: ' + cell.v + '<br>';
-            }
-          }
-          // Display details in the outputTable div
-          var outputTable = document.getElementById('outputTable');
-          outputTable.innerHTML += '<div>' + popupContent + '</div>';
+          // Add marker to the map
+          L.marker(coordinates).addTo(map)
+            .bindPopup(getPopupContent(worksheet, range, R));
         }
       }
     };
 
     req.send();
+  }
+
+  function getPopupContent(worksheet, range, rowIndex) {
+    var popupContent = '';
+    for (var C = range.s.c; C <= range.e.c; ++C) {
+      var headerAddress = { c: C, r: 0 }; // Assuming headers are in the first row
+      var headerRef = XLSX.utils.encode_cell(headerAddress);
+      var header = worksheet[headerRef].v;
+      var cellAddress = { c: C, r: rowIndex };
+      var cellRef = XLSX.utils.encode_cell(cellAddress);
+      var cell = worksheet[cellRef];
+      if (cell && cell.v) {
+        popupContent += '<strong>' + header + '</strong>: ' + cell.v + '<br>';
+      }
+    }
+    return popupContent;
   }
 </script>
 </body>
