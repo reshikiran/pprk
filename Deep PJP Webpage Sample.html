@@ -24,6 +24,7 @@
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     display: flex;
+    flex-direction: column;
   }
   .form-container {
     flex: 1;
@@ -71,6 +72,15 @@
     height: 300px;
     overflow-y: auto;
   }
+  #copyButton {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
 </style>
 </head>
 <body>
@@ -95,6 +105,7 @@
       </div>
     </form>
     <div id="outputTable"></div>
+    <button id="copyButton" onclick="copyTable()">Copy Table</button>
   </div>
 </div>
 
@@ -120,37 +131,19 @@
       var htmlTable = XLSX.utils.sheet_to_html(worksheet);
 
       document.getElementById('outputTable').innerHTML = htmlTable;
-
-      // Get coordinates from 'HO location' column
-      var range = XLSX.utils.decode_range(worksheet['!ref']);
-      for (var R = range.s.r; R <= range.e.r; ++R) {
-        var cellAddress = { c: 7, r: R }; // Assuming 'HO location' column is the 7th column (index starts from 0)
-        var cellRef = XLSX.utils.encode_cell(cellAddress);
-        var cell = worksheet[cellRef];
-        if (cell && cell.v) {
-          var coordinates = cell.v.split(',').map(Number); // Assuming coordinates are comma-separated
-
-          // Add popup with details from Excel
-          var popupContent = '';
-          for (var C = range.s.c; C <= range.e.c; ++C) {
-            var headerAddress = { c: C, r: 0 }; // Assuming headers are in the first row
-            var headerRef = XLSX.utils.encode_cell(headerAddress);
-            var header = worksheet[headerRef].v;
-            var cellAddress = { c: C, r: R };
-            var cellRef = XLSX.utils.encode_cell(cellAddress);
-            var cell = worksheet[cellRef];
-            if (cell && cell.v) {
-              popupContent += '<strong>' + header + '</strong>: ' + cell.v + '<br>';
-            }
-          }
-          // Display details in the outputTable div
-          var outputTable = document.getElementById('outputTable');
-          outputTable.innerHTML += '<div>' + popupContent + '</div>';
-        }
-      }
     };
 
     req.send();
+  }
+
+  function copyTable() {
+    var outputTable = document.getElementById('outputTable');
+    var range = document.createRange();
+    range.selectNode(outputTable);
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    alert('Table copied to clipboard!');
   }
 </script>
 </body>
