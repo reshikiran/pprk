@@ -65,11 +65,11 @@
     <script>
         function calculateCost() {
             const x = [];
-            for (let i = 1; i <= 9; i++) {
+            for (let i = 1; i <= 8; i++) {
                 x[i] = parseFloat(document.getElementById("input" + i).value) || 0;
             }
 
-            let r = x[8] + x[9];
+            let r = x[7] + x[8];
             let s = 999;
 
             let monthlyRental = 0;
@@ -92,34 +92,34 @@
             if(r>=200000)
             {if (x[1] === 1) {
                 if (x[2] === 1) {
-                    totalCostPhonePe = s + (0.013 * x[8]  + 0.004 * x[9]) * 12 + monthlyRental * 6 + 399 * 6-900;
+                    totalCostPhonePe = s + (0.013 * x[7]  + 0.004 * x[8]) * 12 + monthlyRental * 6 + 399 * 6-900;
                 } else {
-                    totalCostPhonePe = s + (0.0155 * x[8]  + 0.004 * x[9]) * 12 + monthlyRental * 6 + 399 * 6-900;
+                    totalCostPhonePe = s + (0.0155 * x[7]  + 0.004 * x[8]) * 12 + monthlyRental * 6 + 399 * 6-900;
                 }
             } else if (x[1] === 2) {
                 if (x[2] === 1) {
-                    totalCostPhonePe = 6499 / 1.5 + (0.013 * x[9] + 0.004 * x[9]) * 12 + monthlyRental * 6 + 49 * 6-900;
+                    totalCostPhonePe = 6499 / 1.5 + (0.013 * x[7] + 0.004 * x[8]) * 12 + monthlyRental * 6 + 49 * 6-900;
                 } else {
-                    totalCostPhonePe = 6499 / 1.5 + (0.0155 * x[9] + 0.004 * x[9]) * 12 + monthlyRental * 6 + 49 * 6-900;
+                    totalCostPhonePe = 6499 / 1.5 + (0.0155 * x[7] + 0.004 * x[8]) * 12 + monthlyRental * 6 + 49 * 6-900;
                 }
             }}
 	    
 	    else if(r<200000)
               {if (x[1] === 1) {
                 if (x[2] === 1) {
-                    totalCostPhonePe = s + (0.013 * x[8]  + 0.004 * x[9]) * 12 + monthlyRental * 6 + 399 * 6;
+                    totalCostPhonePe = s + (0.013 * x[7]  + 0.004 * x[8]) * 12 + monthlyRental * 6 + 399 * 6;
                 } else {
-                    totalCostPhonePe = s + (0.0155 * x[8]  + 0.004 * x[9]) * 12 + monthlyRental * 6 + 399 * 6;
+                    totalCostPhonePe = s + (0.0155 * x[7]  + 0.004 * x[8]) * 12 + monthlyRental * 6 + 399 * 6;
                 }
             } else if (x[1] === 2) {
                 if (x[2] === 1) {
-                    totalCostPhonePe = 6499 / 1.5 + (0.013 * x[9] + 0.004 * x[9]) * 12 + monthlyRental * 6 + 49 * 6;
+                    totalCostPhonePe = 6499 / 1.5 + (0.013 * x[7] + 0.004 * x[8]) * 12 + monthlyRental * 6 + 49 * 6;
                 } else {
-                    totalCostPhonePe = 6499 / 1.5 + (0.0155 * x[9] + 0.004 * x[9]) * 12 + monthlyRental * 6 + 49 * 6;
+                    totalCostPhonePe = 6499 / 1.5 + (0.0155 * x[7] + 0.004 * x[8]) * 12 + monthlyRental * 6 + 49 * 6;
                 }
             }}
 
-            let totalCostCompetition = x[3] + (x[5] / 100 * x[9] + x[6] / 100 * x[9] + x[4]) * 12;
+            let totalCostCompetition = x[3] + (x[5] / 100 * x[7] + x[6] / 100 * x[8] + x[4]) * 12;
             let monthlySavings = (totalCostCompetition - totalCostPhonePe) / 12;
 
             document.getElementById("monthlyRental").innerHTML = monthlyRental;
@@ -157,11 +157,11 @@
     <label for="input6">Rate on Debit Card (Competition, in %):</label>
     <input type="number" id="input6" value="0"><br>
 
-    <label for="input8">Monthly TPV on Credit Card:</label>
-    <input type="number" id="input8" value="0"><br>
+    <label for="input7">Monthly TPV on Credit Card:</label>
+    <input type="number" id="input7" value="0"><br>
 
-    <label for="input9">Monthly TPV on Debit Card:</label>
-    <input type="number" id="input9" value="0"><br>
+    <label for="input8">Monthly TPV on Debit Card:</label>
+    <input type="number" id="input8" value="0"><br>
 
 
     <button onclick="calculateCost()">Calculate</button>
