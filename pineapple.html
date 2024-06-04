@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sketch Recognition</title>
+  <style>
+    #gif {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <video id="video" width="640" height="480" autoplay></video>
+  <img id="gif" src="pineapple.gif" alt="Pineapple GIF" width="640" height="480">
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+  <script>
+    const video = document.getElementById('video');
+    const gif = document.getElementById('gif');
+
+    // Access the camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        console.error("Error accessing the camera: ", err);
+      });
+
+    // Load the TensorFlow model
+    let model;
+    cocoSsd.load().then(loadedModel => {
+      model = loadedModel;
+      detectSketch();
+    });
+
+    // Detect the sketch in the video feed
+    function detectSketch() {
+      model.detect(video).then(predictions => {
+        // Check if any predictions match the sketch of the pineapple
+        const pineappleDetected = predictions.some(prediction => {
+          return prediction.class === 'pineapple';
+        });
+
+        if (pineappleDetected) {
+          video.style.display = 'none';
+          gif.style.display = 'block';
+        } else {
+          video.style.display = 'block';
+          gif.style.display = 'none';
+        }
+
+        requestAnimationFrame(detectSketch);
+      });
+    }
+  </script>
+</body>
+</html>
