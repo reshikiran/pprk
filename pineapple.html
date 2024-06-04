@@ -25,50 +25,66 @@
 </head>
 <body>
   <video id="video" autoplay playsinline></video>
-  <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+  <img id="gif" src="https://github.com/reshikiran/pprk/blob/main/pineapple.gif" alt="Pineapple GIF">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script>
-    const video = document.getElementById('video');
-    const gif = document.getElementById('gif');
+    let video;
+    let gif;
+    let pineappleImage;
+    let capture;
 
-    // Access the back camera
-    navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: { exact: "environment" } }
-    })
-    .then(stream => {
-      video.srcObject = stream;
-      video.style.display = 'block';
-    })
-    .catch(err => {
-      console.error("Error accessing the camera: ", err);
-    });
+    function preload() {
+      pineappleImage = loadImage('https://github.com/reshikiran/pprk/blob/main/pineapple.png');
+    }
 
-    // Load the TensorFlow model
-    let model;
-    cocoSsd.load().then(loadedModel => {
-      model = loadedModel;
-      detectSketch();
-    });
-
-    // Detect the sketch in the video feed
-    function detectSketch() {
-      model.detect(video).then(predictions => {
-        // Check if any predictions match the sketch of the pineapple
-        const pineappleDetected = predictions.some(prediction => {
-          return prediction.class === 'pineapple';
-        });
-
-        if (pineappleDetected) {
-          video.style.display = 'none';
-          gif.style.display = 'block';
-        } else {
-          video.style.display = 'block';
-          gif.style.display = 'none';
+    function setup() {
+      createCanvas(640, 480);
+      capture = createCapture({
+        video: {
+          facingMode: {
+            exact: "environment"
+          }
         }
-
-        requestAnimationFrame(detectSketch);
+      }, function(stream) {
+        video = stream;
+        video.style.display = 'block';
       });
+      capture.hide();
+      gif = document.getElementById('gif');
+    }
+
+    function draw() {
+      image(capture, 0, 0, width, height);
+
+      // Check for the pineapple sketch
+      if (isSimilar(capture, pineappleImage)) {
+        capture.hide();
+        gif.style.display = 'block';
+      } else {
+        capture.show();
+        gif.style.display = 'none';
+      }
+    }
+
+    function isSimilar(capture, pineappleImage) {
+      // Simple similarity check based on pixel data
+      capture.loadPixels();
+      pineappleImage.loadPixels();
+
+      let similarity = 0;
+      let totalPixels = capture.pixels.length;
+
+      for (let i = 0; i < totalPixels; i += 4) {
+        let rDiff = abs(capture.pixels[i] - pineappleImage.pixels[i]);
+        let gDiff = abs(capture.pixels[i + 1] - pineappleImage.pixels[i + 1]);
+        let bDiff = abs(capture.pixels[i + 2] - pineappleImage.pixels[i + 2]);
+
+        if (rDiff < 50 && gDiff < 50 && bDiff < 50) {
+          similarity++;
+        }
+      }
+
+      return (similarity / (totalPixels / 4)) > 0.7;  // Adjust threshold as needed
     }
   </script>
 </body>
