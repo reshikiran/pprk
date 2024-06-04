@@ -13,30 +13,18 @@
       height: 100vh;
       background-color: #f0f0f0;
     }
-    #container {
-      position: relative;
+    #video, #gif {
       width: 100%;
-      max-width: 640px; /* Adjust maximum width for mobile */
-    }
-    #video {
-      width: 100%;
-      height: auto;
+      max-width: 640px;
     }
     #gif {
       display: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: auto;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <video id="video" autoplay playsinline></video>
-    <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
-  </div>
+  <video id="video" autoplay playsinline></video>
+  <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
@@ -74,7 +62,6 @@
 
     async function main() {
       const video = await setupCamera();
-      const container = document.getElementById('container');
       const gif = document.getElementById('gif');
       const model = await loadModel();
       const pineappleImage = await loadPineappleImage();
@@ -85,10 +72,10 @@
         const similarity = await tf.losses.cosineDistance(pineappleFeatures, videoFeatures, 0).dataSync();
 
         if (similarity < 0.5) { // Adjust threshold as necessary
+          video.style.display = 'none';
           gif.style.display = 'block';
-          gif.style.top = `${(container.offsetHeight - video.offsetHeight) / 2}px`;
-          gif.style.left = `${(container.offsetWidth - video.offsetWidth) / 2}px`;
         } else {
+          video.style.display = 'block';
           gif.style.display = 'none';
         }
         requestAnimationFrame(detect);
