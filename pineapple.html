@@ -5,28 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sketch Recognition</title>
   <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    #video, #gif {
+      width: 100%;
+      max-width: 640px;
+      display: none;
+    }
     #gif {
       display: none;
     }
   </style>
 </head>
 <body>
-  <video id="video" width="640" height="480" autoplay></video>
-  <img id="gif" src="pineapple.gif" alt="Pineapple GIF" width="640" height="480">
+  <video id="video" autoplay playsinline></video>
+  <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
   <script>
     const video = document.getElementById('video');
     const gif = document.getElementById('gif');
 
-    // Access the camera
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        video.srcObject = stream;
-      })
-      .catch(err => {
-        console.error("Error accessing the camera: ", err);
-      });
+    // Access the back camera
+    navigator.mediaDevices.getUserMedia({ 
+      video: { facingMode: { exact: "environment" } }
+    })
+    .then(stream => {
+      video.srcObject = stream;
+      video.style.display = 'block';
+    })
+    .catch(err => {
+      console.error("Error accessing the camera: ", err);
+    });
 
     // Load the TensorFlow model
     let model;
