@@ -25,65 +25,61 @@
 <body>
   <video id="video" autoplay playsinline></video>
   <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script>
-    async function setupCamera() {
-      const video = document.getElementById('video');
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: "environment" } }
-      });
-      video.srcObject = stream;
-      await new Promise((resolve) => {
-        video.onloadedmetadata = () => {
-          resolve(video);
-        };
-      });
-      video.play();
-      return video;
+    let video;
+    let gif;
+    let targetImage;
+    let similarityThreshold = 0.1;
+
+    function preload() {
+      targetImage = loadImage('https://reshikiran.github.io/pprk/pineapple.png');
     }
 
-    async function loadModel() {
-      return await mobilenet.load();
-    }
-
-    async function loadPineappleImage() {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = 'https://reshikiran.github.io/pprk/pineapple.png';
-      await new Promise((resolve) => {
-        img.onload = () => {
-          resolve(img);
-        };
-      });
-      return img;
-    }
-
-    async function main() {
-      const video = await setupCamera();
-      const gif = document.getElementById('gif');
-      const model = await loadModel();
-      const pineappleImage = await loadPineappleImage();
-      const pineappleFeatures = model.infer(pineappleImage, true);
-
-      async function detect() {
-        const videoFeatures = model.infer(video, true);
-        const similarity = await tf.losses.cosineDistance(pineappleFeatures, videoFeatures, 0).dataSync();
-
-        if (similarity < 0.5) { // Adjust threshold as necessary
-          video.style.display = 'none';
-          gif.style.display = 'block';
-        } else {
-          video.style.display = 'block';
-          gif.style.display = 'none';
+    function setup() {
+      noCanvas();
+      video = createCapture({
+        video: {
+          facingMode: {
+            exact: "environment"
+          }
         }
-        requestAnimationFrame(detect);
-      }
-
+      });
+      video.size(640, 480);
+      video.hide();
+      gif = document.getElementById('gif');
       detect();
     }
 
-    main();
+    function detect() {
+      video.loadPixels();
+      targetImage.loadPixels();
+
+      let matches = 0;
+      let totalPixels = video.pixels.length / 4;
+
+      for (let i = 0; i < video.pixels.length; i += 4) {
+        let rDiff = abs(video.pixels[i] - targetImage.pixels[i]);
+        let gDiff = abs(video.pixels[i + 1] - targetImage.pixels[i + 1]);
+        let bDiff = abs(video.pixels[i + 2] - targetImage.pixels[i + 2]);
+
+        if (rDiff < 50 && gDiff < 50 && bDiff < 50) {
+          matches++;
+        }
+      }
+
+      let similarity = matches / totalPixels;
+
+      if (similarity > similarityThreshold) {
+        video.hide();
+        gif.style.display = 'block';
+      } else {
+        video.show();
+        gif.style.display = 'none';
+      }
+
+      setTimeout(detect, 100);
+    }
   </script>
 </body>
 </html>
