@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sketch Recognition</title>
+  <title>Pineapple Sketch Recognition</title>
   <style>
     body {
       margin: 0;
@@ -13,18 +13,30 @@
       height: 100vh;
       background-color: #f0f0f0;
     }
-    #video, #gif {
+    #container {
+      position: relative;
       width: 100%;
-      max-width: 640px;
+      max-width: 640px; /* Adjust maximum width for mobile */
+    }
+    #video {
+      width: 100%;
+      height: auto;
     }
     #gif {
       display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
     }
   </style>
 </head>
 <body>
-  <video id="video" autoplay playsinline></video>
-  <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
+  <div id="container">
+    <video id="video" autoplay playsinline></video>
+    <img id="gif" src="https://media.giphy.com/media/VxbvpfaTTo3le/giphy.gif" alt="Pineapple GIF">
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
@@ -48,34 +60,21 @@
       return await mobilenet.load();
     }
 
-    async function loadPineappleImage() {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = 'https://reshikiran.github.io/pprk/pineapple.png';
-      await new Promise((resolve) => {
-        img.onload = () => {
-          resolve(img);
-        };
-      });
-      return img;
-    }
-
     async function main() {
       const video = await setupCamera();
+      const container = document.getElementById('container');
       const gif = document.getElementById('gif');
       const model = await loadModel();
-      const pineappleImage = await loadPineappleImage();
-      const pineappleFeatures = model.infer(pineappleImage, 'conv_preds');
 
       async function detect() {
-        const videoFeatures = model.infer(video, 'conv_preds');
-        const similarity = await tf.losses.cosineDistance(pineappleFeatures, videoFeatures, 0).dataSync();
+        const predictions = await model.detect(video);
+        const pineapplePredictions = predictions.filter(prediction => prediction.class === 'pineapple');
 
-        if (similarity < 0.5) { // Adjust threshold as necessary
-          video.style.display = 'none';
+        if (pineapplePredictions.length > 0) {
           gif.style.display = 'block';
+          gif.style.top = `${(container.offsetHeight - video.offsetHeight) / 2}px`;
+          gif.style.left = `${(container.offsetWidth - video.offsetWidth) / 2}px`;
         } else {
-          video.style.display = 'block';
           gif.style.display = 'none';
         }
         requestAnimationFrame(detect);
