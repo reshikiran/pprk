@@ -39,7 +39,6 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
   <script>
     async function setupCamera() {
       const video = document.getElementById('video');
@@ -57,7 +56,7 @@
     }
 
     async function loadModel() {
-      return await cocoSsd.load();
+      return await cocoSsd.load({ base: 'lite_mobilenet_v2' }); // Using a lighter model for better performance on mobile devices
     }
 
     async function main() {
