@@ -16,7 +16,6 @@
     #video, #gif {
       width: 100%;
       max-width: 640px;
-      display: none;
     }
     #gif {
       display: none;
@@ -29,11 +28,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
   <script>
-    const video = document.getElementById('video');
-    const gif = document.getElementById('gif');
-
     async function setupCamera() {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } });
+      const video = document.getElementById('video');
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: { exact: "environment" } }
+      });
       video.srcObject = stream;
       await new Promise((resolve) => {
         video.onloadedmetadata = () => {
@@ -41,7 +40,6 @@
         };
       });
       video.play();
-      video.style.display = 'block';
       return video;
     }
 
@@ -62,15 +60,17 @@
     }
 
     async function main() {
+      const video = await setupCamera();
+      const gif = document.getElementById('gif');
       const model = await loadModel();
       const pineappleImage = await loadPineappleImage();
       const pineappleFeatures = model.infer(pineappleImage, true);
-      const videoElement = await setupCamera();
 
       async function detect() {
-        const videoFeatures = model.infer(videoElement, true);
-        const similarity = await videoFeatures.dot(pineappleFeatures).dataSync()[0];
-        if (similarity > 0.5) { // Adjust threshold as necessary
+        const videoFeatures = model.infer(video, true);
+        const similarity = await tf.losses.cosineDistance(pineappleFeatures, videoFeatures, 0).dataSync();
+
+        if (similarity < 0.1) { // Adjust threshold as necessary
           video.style.display = 'none';
           gif.style.display = 'block';
         } else {
@@ -79,6 +79,7 @@
         }
         requestAnimationFrame(detect);
       }
+
       detect();
     }
 
