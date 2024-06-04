@@ -26,66 +26,63 @@
 <body>
   <video id="video" autoplay playsinline></video>
   <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
   <script>
-    let video;
-    let gif;
-    let pineappleImage;
-    let capture;
+    const video = document.getElementById('video');
+    const gif = document.getElementById('gif');
 
-    function preload() {
-      pineappleImage = loadImage('https://reshikiran.github.io/pprk/pineapple.png');
-    }
-
-    function setup() {
-      createCanvas(640, 480);
-      capture = createCapture({
-        video: {
-          facingMode: {
-            exact: "environment"
-          }
-        }
-      }, function(stream) {
-        video = stream;
-        video.style.display = 'block';
+    async function setupCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } });
+      video.srcObject = stream;
+      await new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+          resolve(video);
+        };
       });
-      capture.hide();
-      gif = document.getElementById('gif');
+      video.play();
+      video.style.display = 'block';
+      return video;
     }
 
-    function draw() {
-      image(capture, 0, 0, width, height);
-
-      // Check for the pineapple sketch
-      if (isSimilar(capture, pineappleImage)) {
-        capture.hide();
-        gif.style.display = 'block';
-      } else {
-        capture.show();
-        gif.style.display = 'none';
-      }
+    async function loadModel() {
+      return await mobilenet.load();
     }
 
-    function isSimilar(capture, pineappleImage) {
-      // Simple similarity check based on pixel data
-      capture.loadPixels();
-      pineappleImage.loadPixels();
+    async function loadPineappleImage() {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = 'https://reshikiran.github.io/pprk/pineapple.png';
+      await new Promise((resolve) => {
+        img.onload = () => {
+          resolve(img);
+        };
+      });
+      return img;
+    }
 
-      let similarity = 0;
-      let totalPixels = capture.pixels.length;
+    async function main() {
+      const model = await loadModel();
+      const pineappleImage = await loadPineappleImage();
+      const pineappleFeatures = model.infer(pineappleImage, true);
+      const videoElement = await setupCamera();
 
-      for (let i = 0; i < totalPixels; i += 4) {
-        let rDiff = abs(capture.pixels[i] - pineappleImage.pixels[i]);
-        let gDiff = abs(capture.pixels[i + 1] - pineappleImage.pixels[i + 1]);
-        let bDiff = abs(capture.pixels[i + 2] - pineappleImage.pixels[i + 2]);
-
-        if (rDiff < 50 && gDiff < 50 && bDiff < 50) {
-          similarity++;
+      async function detect() {
+        const videoFeatures = model.infer(videoElement, true);
+        const similarity = await videoFeatures.dot(pineappleFeatures).dataSync()[0];
+        if (similarity > 0.5) { // Adjust threshold as necessary
+          video.style.display = 'none';
+          gif.style.display = 'block';
+        } else {
+          video.style.display = 'block';
+          gif.style.display = 'none';
         }
+        requestAnimationFrame(detect);
       }
-
-      return (similarity / (totalPixels / 4)) > 0.7;  // Adjust threshold as needed
+      detect();
     }
+
+    main();
   </script>
 </body>
 </html>
