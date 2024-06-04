@@ -77,7 +77,7 @@
       const videoFeatures = model.infer(video, true);
       const similarity = await tf.losses.cosineDistance(pineappleFeatures, videoFeatures, 0).dataSync();
 
-      if (similarity < 0.5) { // Adjust threshold as necessary
+      if (similarity < 0.7) { // Adjust threshold as necessary
         gif.style.display = 'block';
       } else {
         gif.style.display = 'none';
