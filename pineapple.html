@@ -13,24 +13,38 @@
       height: 100vh;
       background-color: #f0f0f0;
     }
-    #video, #gif {
+    #container {
+      position: relative;
       width: 100%;
       max-width: 640px;
     }
+    #video {
+      width: 100%;
+      height: auto;
+    }
     #gif {
       display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
 <body>
-  <video id="video" autoplay playsinline></video>
-  <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
+  <div id="container">
+    <video id="video" autoplay playsinline></video>
+    <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
   <script>
+    let video, gif, model, pineappleImage, pineappleFeatures;
+
     async function setupCamera() {
-      const video = document.getElementById('video');
+      video = document.getElementById('video');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { exact: "environment" } }
       });
@@ -41,46 +55,41 @@
         };
       });
       video.play();
-      return video;
     }
 
     async function loadModel() {
-      return await mobilenet.load();
+      model = await mobilenet.load();
     }
 
     async function loadPineappleImage() {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = 'https://reshikiran.github.io/pprk/pineapple.png';
+      pineappleImage = new Image();
+      pineappleImage.crossOrigin = "anonymous";
+      pineappleImage.src = 'https://reshikiran.github.io/pprk/pineapple.png';
       await new Promise((resolve) => {
-        img.onload = () => {
-          resolve(img);
+        pineappleImage.onload = () => {
+          resolve(pineappleImage);
         };
       });
-      return img;
+      pineappleFeatures = model.infer(pineappleImage, true);
+    }
+
+    async function detect() {
+      const videoFeatures = model.infer(video, true);
+      const similarity = await tf.losses.cosineDistance(pineappleFeatures, videoFeatures, 0).dataSync();
+
+      if (similarity < 0.5) { // Adjust threshold as necessary
+        gif.style.display = 'block';
+      } else {
+        gif.style.display = 'none';
+      }
+      requestAnimationFrame(detect);
     }
 
     async function main() {
-      const video = await setupCamera();
-      const gif = document.getElementById('gif');
-      const model = await loadModel();
-      const pineappleImage = await loadPineappleImage();
-      const pineappleFeatures = model.infer(pineappleImage, 'conv_preds');
-
-      async function detect() {
-        const videoFeatures = model.infer(video, 'conv_preds');
-        const similarity = await tf.losses.cosineDistance(pineappleFeatures, videoFeatures, 0).dataSync();
-
-        if (similarity < 0.5) { // Adjust threshold as necessary
-          video.style.display = 'none';
-          gif.style.display = 'block';
-        } else {
-          video.style.display = 'block';
-          gif.style.display = 'none';
-        }
-        requestAnimationFrame(detect);
-      }
-
+      gif = document.getElementById('gif');
+      await setupCamera();
+      await loadModel();
+      await loadPineappleImage();
       detect();
     }
 
