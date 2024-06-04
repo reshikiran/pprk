@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dog Image Recognition</title>
+  <title>Pineapple Image Recognition</title>
   <style>
     body {
       margin: 0;
@@ -35,7 +35,7 @@
 <body>
   <div id="container">
     <video id="video" autoplay playsinline></video>
-    <img id="gif" src="https://reshikiran.github.io/pprk/dog.gif" alt="Dog GIF">
+    <img id="gif" src="https://reshikiran.github.io/pprk/pineapple.gif" alt="Pineapple GIF">
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
@@ -68,9 +68,9 @@
 
       async function detect() {
         const predictions = await model.detect(video);
-        const dogPredictions = predictions.filter(prediction => prediction.class === 'dog');
+        const pineapplePredictions = predictions.filter(prediction => prediction.class === 'pineapple');
 
-        if (dogPredictions.length > 0) {
+        if (pineapplePredictions.length > 0) {
           gif.style.display = 'block';
           gif.style.top = `${(container.offsetHeight - video.offsetHeight) / 2}px`;
           gif.style.left = `${(container.offsetWidth - video.offsetWidth) / 2}px`;
