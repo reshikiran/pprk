@@ -30,7 +30,7 @@
   <script>
     async function setupCamera() {
       const video = document.getElementById('video');
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { exact: "environment" } }
       });
       video.srcObject = stream;
@@ -70,7 +70,7 @@
         const videoFeatures = model.infer(video, true);
         const similarity = await tf.losses.cosineDistance(pineappleFeatures, videoFeatures, 0).dataSync();
 
-        if (similarity < 0.1) { // Adjust threshold as necessary
+        if (similarity < 0.5) { // Adjust threshold as necessary
           video.style.display = 'none';
           gif.style.display = 'block';
         } else {
