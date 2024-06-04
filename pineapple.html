@@ -1,73 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Image Detection</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dog Image Recognition</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       background-color: #f0f0f0;
     }
-    
+    #container {
+      position: relative;
+      width: 100%;
+      max-width: 640px; /* Adjust maximum width for mobile */
+    }
     #video {
       width: 100%;
-      max-width: 640px;
       height: auto;
-      display: block;
     }
-    
     #gif {
-      position: absolute;
-      width: 50%;
-      height: auto;
       display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
     }
   </style>
 </head>
 <body>
-  <video id="video" autoplay></video>
-  <img id="gif" src="https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif" alt="Pineapple GIF">
-
+  <div id="container">
+    <video id="video" autoplay playsinline></video>
+    <img id="gif" src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Dog GIF">
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
   <script>
-    const video = document.getElementById('video');
-    const gif = document.getElementById('gif');
-    const targetImage = new Image();
-    targetImage.src = 'https://reshikiran.github.io/pprk/pineapple.png';
-
-    // Get access to the camera
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        video.srcObject = stream;
-      })
-      .catch(error => {
-        console.error('Error accessing camera:', error);
+    async function setupCamera() {
+      const video = document.getElementById('video');
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: "environment" } }
       });
+      video.srcObject = stream;
+      await new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+          resolve(video);
+        };
+      });
+      video.play();
+      return video;
+    }
 
-    // Detect the image every second
-    setInterval(() => {
-      // Capture a frame from the video
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    async function loadModel() {
+      return await cocoSsd.load();
+    }
 
-      // Get the frame as a data URL
-      const frameDataURL = canvas.toDataURL();
+    async function main() {
+      const video = await setupCamera();
+      const container = document.getElementById('container');
+      const gif = document.getElementById('gif');
+      const model = await loadModel();
 
-      // Check if the frame contains the target image
-      if (frameDataURL.includes(targetImage.src)) {
-        // Show the GIF
-        gif.style.display = 'block';
-      } else {
-        // Hide the GIF
-        gif.style.display = 'none';
+      async function detect() {
+        const predictions = await model.detect(video);
+        const dogPredictions = predictions.filter(prediction => prediction.class === 'dog');
+
+        if (dogPredictions.length > 0) {
+          gif.style.display = 'block';
+          gif.style.top = `${(container.offsetHeight - video.offsetHeight) / 2}px`;
+          gif.style.left = `${(container.offsetWidth - video.offsetWidth) / 2}px`;
+        } else {
+          gif.style.display = 'none';
+        }
+        requestAnimationFrame(detect);
       }
-    }, 1000);
+
+      detect();
+    }
+
+    main();
   </script>
 </body>
 </html>
