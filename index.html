@@ -1,1 +1,145 @@
+<head>
+  <html>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-88EHVLE2RS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-88EHVLE2RS');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incentive/Savings Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #f7ede4;
+            padding: 10px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+            color: #333; /* Optional: Set the text color */
+        }
+        .button-container {
+            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .button-container a {
+            width: 48%;
+            margin: 10px; /* Adjust the margin for spacing between buttons */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ccc; /* Optional: Add a border for styling */
+            border-radius: 8px; /* Optional: Add border radius for styling */
+            padding: 20px; /* Optional: Add padding for spacing */
+            text-decoration: none; /* Optional: Remove underline */
+            color: white; /* Set button text color */
+            font-weight: bold; /* Set font weight to bold */
+        }
+        .button-container a:nth-child(1) {
+            background-color: #9B51E0; /* Set background color for the first button */
+        }
+        .button-container a:nth-child(2) {
+            background-color: #345C00; /* Set background color for the second button */
+        }
+        .button-container a:nth-child(3) {
+            background-color: #2323A4; /* Set background color for the third button */
+        }
+        .button-container a:nth-child(4) {
+            background-color: #997570; /* Set background color for the fourth button */
+        }
+        .caption {
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            /* Adjust the width for small screens (e.g., mobile devices) */
+            .button-container a {
+                width: 100%; /* Make buttons take full width on small screens */
+            }
+        }
+
+        /* Update Pop-up Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #8B0000; /* Dark grey background */
+            color: white; /* White text color */
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+        }
+        .popup h2 {
+            margin: 0;
+            color: #fff;
+        }
+        .popup p {
+            margin: 10px 0;
+            color: #fff;
+        }
+        .close-btn {
+            cursor: pointer;
+            color: #9B51E0;
+            font-weight: bold;
+        }
+    </style>
+    <!-- Include FontAwesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-6eCJbRZ+f3cAekPHyHEJrskIJN2Sf3GjLjyo3u98KSP6Ag4K/N4pZ38cM8PFMBo8Ag6BwlVdhFdQl0BDaCsOVtQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <header>
+        <h1>Incentive/Savings Calculator</h1>
+    </header>
+    <div class="button-container">
+        <a href="Incentive Calculator Urban Ace Collection.html">
+            Incentive Calculator (Urban)
+        </a>
+        <a href="EDC Savings Small Ace Collection.html">
+            EDC Savings Calculator <br> (Small Merchants)
+        </a>
+        <a href="EDC Savings Large Ace Collection.html">
+            EDC Savings Calculator <br> (Large Merchants)
+        </a>
+        <a href="RDD ROI Calculator.html">
+            RDD ROI Calculator
+        </a>
+    </div>
+
+    <!-- Your calculator content goes here -->
+
+    <!-- Update Pop-up -->
+    <div class="popup" id="updatePopup">
+        <h2>New Updates</h2>
+        <p>1. Incentive Calculator for Exclusive RRR Agents</p>
+<p>2. RDD ROI Calculator</p>
+        <span class="close-btn" onclick="closePopup()">Close</span>
+    </div>
+
+    <script>
+        // Display the update pop-up when the page loads
+        window.onload = function () {
+            document.getElementById('updatePopup').style.display = 'block';
+        };
+
+        // Close the update pop-up
+        function closePopup() {
+            document.getElementById('updatePopup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
+
+
 
