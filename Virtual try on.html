@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Try-On</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+        }
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+        }
+        video, canvas {
+            position: absolute;
+            width: 100%;
+            height: auto;
+            transform: scaleX(-1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const shirtImages = [
+            'https://upload.wikimedia.org/wikipedia/commons/8/89/Tshirt.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/2/24/Blue_Tshirt.jpg'
+        ];
+
+        async function setupCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "user",
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                });
+                video.srcObject = stream;
+                await new Promise(resolve => video.onloadedmetadata = resolve);
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+            } catch (error) {
+                console.error("Error accessing the camera:", error);
+                alert("Unable to access camera. Please check your permissions.");
+            }
+        }
+
+        async function loadPoseModel() {
+            try {
+                return await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet);
+            } catch (error) {
+                console.error("Error loading pose detection model:", error);
+            }
+        }
+
+        async function detectPose(detector) {
+            try {
+                const poses = await detector.estimatePoses(video);
+                if (poses.length > 0) {
+                    const keypoints = poses[0].keypoints;
+                    const leftShoulder = keypoints[5];
+                    const rightShoulder = keypoints[6];
+                    const midpointX = (leftShoulder.x + rightShoulder.x) / 2;
+                    const midpointY = (leftShoulder.y + rightShoulder.y) / 2;
+                    const width = Math.abs(leftShoulder.x - rightShoulder.x) * 2;
+                    return { x: midpointX, y: midpointY, width };
+                }
+            } catch (error) {
+                console.error("Error detecting pose:", error);
+            }
+            return null;
+        }
+
+        async function startVirtualTryOn() {
+            await setupCamera();
+            const detector = await loadPoseModel();
+            if (!detector) return;
+            const shirtImg = new Image();
+            shirtImg.src = shirtImages[Math.floor(Math.random() * shirtImages.length)];
+            shirtImg.onload = function() {
+                function renderFrame() {
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    detectPose(detector).then(pose => {
+                        if (pose) {
+                            ctx.drawImage(shirtImg, pose.x - pose.width / 2, pose.y, pose.width, pose.width * 1.2);
+                        }
+                    });
+                    requestAnimationFrame(renderFrame);
+                }
+                renderFrame();
+            };
+            shirtImg.onerror = function() {
+                console.error("Error loading shirt image.");
+            };
+        }
+
+        startVirtualTryOn();
+    </script>
+</body>
+</html>
